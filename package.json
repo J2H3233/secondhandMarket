@@ -1,0 +1,30 @@
+{
+  "name": "shm",
+  "version": "1.0.0",
+  "description": "",
+  "homepage": "https://github.com/J2H3233/secondhandMarket#readme",
+  "bugs": {
+    "url": "https://github.com/J2H3233/secondhandMarket/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/J2H3233/secondhandMarket.git"
+  },
+  "license": "ISC",
+  "author": "",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "nodemon -e js,json,prisma --exec \"prisma generate && node src/index.js\"",
+    "run": "node index.js"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "cors": "^2.8.5",
+    "dotenv": "^17.2.3",
+    "express": "^5.1.0",
+    "morgan": "^1.10.1",
+    "prisma": "^6.19.0"
+  }
+}
