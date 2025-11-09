@@ -1,0 +1,41 @@
+{
+  "compilerOptions": {
+    // 파일 레이아웃
+    "rootDir": "./src",
+    "outDir": "./dist",
+
+    // 환경 설정 (Node.js & ESM)
+    "module": "NodeNext",
+    "target": "ES2022",
+    "lib": ["ES2022"],
+    "types": ["node"],
+    
+    // 👇 tsoa를 위해 반드시 추가해야 할 옵션
+    "emitDecoratorMetadata": true, 
+    "experimentalDecorators": true, 
+    
+    // ... 나머지 설정 ...
+    "emitDeclarationOnly": true, 
+    "noEmitOnError": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    
+    // 모듈 시스템의 엄격함 및 일관성 (유지)
+    "verbatimModuleSyntax": true,
+    "isolatedModules": true,
+    "noUncheckedSideEffectImports": true,
+    "moduleDetection": "force",
+    
+    // 출력 설정
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    // 엄격한 타입 검사
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true
+  },
+  "include": ["src/**/*"]
+}
