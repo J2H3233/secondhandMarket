@@ -1,41 +1,49 @@
 {
   "compilerOptions": {
-    // 파일 레이아웃
-    "rootDir": "./src",
-    "outDir": "./dist",
+    // ------------------------------------
+    // 파일 레이아웃 및 출력 위치 설정
+    // ------------------------------------
+    "rootDir": "./src",      // TypeScript 소스 파일이 위치한 최상위 디렉토리
+    "outDir": "./dist",      // 컴파일된 JavaScript 및 기타 출력 파일이 저장될 디렉토리
 
-    // 환경 설정 (Node.js & ESM)
-    "module": "NodeNext",
-    "target": "ES2022",
-    "lib": ["ES2022"],
-    "types": ["node"],
-    
-    // 👇 tsoa를 위해 반드시 추가해야 할 옵션
-    "emitDecoratorMetadata": true, 
-    "experimentalDecorators": true, 
-    
-    // ... 나머지 설정 ...
-    "emitDeclarationOnly": true, 
-    "noEmitOnError": true,
-    "esModuleInterop": true,
-    "forceConsistentCasingInFileNames": true,
-    "strict": true,
-    "skipLibCheck": true,
-    
-    // 모듈 시스템의 엄격함 및 일관성 (유지)
-    "verbatimModuleSyntax": true,
-    "isolatedModules": true,
-    "noUncheckedSideEffectImports": true,
-    "moduleDetection": "force",
-    
-    // 출력 설정
-    "sourceMap": true,
-    "declaration": true,
-    "declarationMap": true,
+    // ------------------------------------
+    // 환경 설정 (대상 런타임 및 모듈 시스템)
+    // ------------------------------------
+    "module": "NodeNext",    // 생성될 JavaScript 모듈 시스템 (Node.js의 최신 ESM 방식)
+    "target": "ES2022",      // 컴파일된 JavaScript 코드의 대상 ECMAScript 버전
+    "lib": ["ES2022"],       // 프로젝트에서 사용할 수 있는 내장 API 타입 정의 파일
+    "types": ["node"],       // 프로젝트에 포함할 타입 선언 파일 목록 (Node.js 환경의 타입 사용)
 
-    // 엄격한 타입 검사
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true
+    // ------------------------------------
+    // 컴파일러 동작 및 엄격성
+    // ------------------------------------
+    "emitDeclarationOnly": true,   // JavaScript 파일(.js)은 생성하지 않고, 타입 선언 파일(.d.ts)만 생성
+    "noEmitOnError": true,         // 컴파일 에러 발생 시 파일 생성을 중단
+    "esModuleInterop": true,       // CommonJS와 ES 모듈 간의 상호 운용성을 개선
+    "forceConsistentCasingInFileNames": true, // 파일 이름에서 대소문자 일관성 강제
+    "strict": true,                // 모든 엄격한 타입 검사 옵션 활성화 (권장)
+    "skipLibCheck": true,          // node_modules 내부의 라이브러리 타입 검사를 건너뜀 (속도 향상)
+
+    // ------------------------------------
+    // 모듈 시스템의 엄격함 및 일관성 (최신 모범 사례)
+    // ------------------------------------
+    "verbatimModuleSyntax": true,  // import/export 구문이 변환 시 거의 그대로 유지되도록 강제
+    "isolatedModules": true,       // 모든 파일을 독립적인 모듈로 간주 (번들러 환경에 적합)
+    "noUncheckedSideEffectImports": true, // Side Effect만을 위한 import 사용 제한
+    "moduleDetection": "force",    // 모든 파일을 무조건 모듈로 처리하도록 강제
+
+    // ------------------------------------
+    // 출력 설정 (맵 파일 생성)
+    // ------------------------------------
+    "sourceMap": true,             // 디버깅을 위한 JavaScript 소스 맵 파일(.js.map) 생성
+    "declaration": true,           // 타입 선언 파일(.d.ts) 생성 (라이브러리 배포 등에 필요)
+    "declarationMap": true,        // .d.ts 파일과 원본 .ts 파일을 연결하는 맵 파일(.d.ts.map) 생성
+
+    // ------------------------------------
+    // 추가 엄격한 타입 검사
+    // ------------------------------------
+    "noUncheckedIndexedAccess": true, // 배열/객체 인덱스 접근 시 undefined 가능성을 명시적으로 처리하도록 강제
+    "exactOptionalPropertyTypes": true // 선택적 속성(?)에 undefined를 명시적으로 할당하는 것을 방지
   },
-  "include": ["src/**/*"]
+  "include": ["src/**/*"] // 타입 검사 및 컴파일할 TypeScript 파일의 경로 지정 (src 폴더 전체)
 }
