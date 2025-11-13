@@ -44,3 +44,11 @@
     UNKNOWN_ERROR: 'UNKNOWN_ERROR'
 
 });
+
+ export const SuccessCodes = Object.freeze({
+
+    OK: 'OK',
+    CREATED: 'CREATED',
+    UPDATED: 'UPDATED',
+    DELETED: 'DELETED'
+});

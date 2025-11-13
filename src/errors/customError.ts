@@ -1,4 +1,4 @@
-import { ErrorCodes } from './errorCodes.js';
+import { ErrorCodes } from './responseCodes.js';
 
 class CustomError extends Error {
 

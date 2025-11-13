@@ -26,3 +26,4 @@ export const createUser = async (username: string, phone_num: string, region_id:
         }
     });
 };
+

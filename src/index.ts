@@ -10,6 +10,8 @@ import swaggerJsdoc from 'swagger-jsdoc';
 import swaggerOptions from './config/swagger.config.js';
 import session from 'express-session';
 import 'express-session';
+import { errorHandler } from './middlewares/errorHandler.js';
+import { responseHandler } from './middlewares/responseHandler.js';
 
 dotenv.config();
 
@@ -50,6 +52,8 @@ app.use('/api', apiRouter);
 
 // SSR 라우터
 app.use('/', ssrRouter);
+
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`서버 작동 중 ${PORT}`);

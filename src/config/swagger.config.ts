@@ -39,7 +39,7 @@ const options: Options = {
     // 💡 Swagger 주석을 스캔할 파일 경로
     // **주의:** 실제 실행 시점에는 컴파일된 JS 파일이 아닌, TS 파일을 스캔해야 합니다.
     // 현재 `tsx`로 바로 실행하므로 .ts 파일을 지정합니다.
-    apis: ['./src/routes/*.ts', './src/controllers/*.ts', './src/models/*.ts'], 
+    apis: ['./src/routers/**/*.ts', './src/controllers/*.ts', './src/models/*.ts'], 
 };
 
 export default options;
