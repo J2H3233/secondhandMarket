@@ -33,6 +33,8 @@ app.use(
 
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
+app.use(responseHandler as any);
+
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'no_key', 
@@ -53,7 +55,8 @@ app.use('/api', apiRouter);
 // SSR 라우터
 app.use('/', ssrRouter);
 
-app.use(errorHandler);
+app.use(errorHandler as any);
+
 
 app.listen(PORT, () => {
   console.log(`서버 작동 중 ${PORT}`);

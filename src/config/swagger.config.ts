@@ -8,7 +8,7 @@ const swaggerDefinition = {
     info: {
         title: 'SHM Secondhand Market API', // ⬅️ API 제목
         version: '1.0.0', // ⬅️ API 버전
-        description: 'tsoa 없이 JSDoc을 사용하여 문서화된 중고 마켓 API입니다.',
+        description: 'JSDoc을 사용하여 문서화된 중고 마켓 API입니다.',
     },
     servers: [
         {
