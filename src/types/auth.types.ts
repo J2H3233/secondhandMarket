@@ -12,5 +12,5 @@ export interface LoginBody {
 }
 
 export interface SessionUserInfo {
-    email: string;
+    userId?: number;
 }

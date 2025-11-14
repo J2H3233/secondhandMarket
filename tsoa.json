@@ -1,0 +1,22 @@
+
+{
+  "entryFile": "src/index.ts", 
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist"
+  },
+"controllerPathGlobs": [
+    "src/**/*Controller.ts", 
+    "src/controllers/*.ts"  
+  ],
+  "spec": {
+
+    "outputDirectory": "src/generated", 
+    "entryFile": "src/index.ts",
+    "specVersion": 3
+  },
+
+  "routes": {
+    "routesDir": "src/generated" 
+  }
+}

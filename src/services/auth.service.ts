@@ -48,6 +48,8 @@ export const loginUser = async (loginData: { email: string; password: string; })
     if(!passwordMatch) {
         throw new CustomError(401, ErrorCodes.UNAUTHORIZED, '비밀번호가 일치하지 않습니다.');
     }
-    
-    return { email: userAccount.email };
+
+    return { userId: userAccount.user_id };
 }
+
+
