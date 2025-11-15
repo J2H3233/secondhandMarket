@@ -15,14 +15,13 @@
   "type": "module",
   "main": "dist/index.js",
   "scripts": {
-      "test": "echo \"Error: no test specified\" && exit 1",
-      "predev": "npm run prisma:generate",
-      "dev": "nodemon --watch src -e ts,tsx --exec \"tsx src/index.ts\"",
-      "prisma:generate": "npx prisma generate",
-      "tsoa:spec": "tsoa spec", 
-      "build": "npm run tsoa:spec && tsc", 
-      "start": "node dist/index.js"
-    },
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "predev": "npm run prisma:generate",
+    "dev": "nodemon --watch src -e ts,tsx --exec \"tsx src/index.ts\"",
+    "prisma:generate": "npx prisma generate",
+    "tsoa:spec": "tsoa spec",
+    "start": "node dist/index.js"
+  },
   "dependencies": {
     "@prisma/client": "^6.19.0",
     "body-parser": "^2.2.0",
@@ -30,8 +29,7 @@
     "dotenv": "^17.2.3",
     "express": "^5.1.0",
     "express-session": "^1.18.2",
-    "morgan": "^1.10.1",
-    "tsoa": "^6.6.0"
+    "morgan": "^1.10.1"
   },
   "devDependencies": {
     "@types/bcrypt": "^6.0.0",
