@@ -1,10 +1,11 @@
 import { signupUser, loginUser } from "../services/auth.service.js";
 import type { Request, Response, NextFunction } from "express";
-import type { SignupBody, LoginBody } from "../types/auth.types.js";
+import type { SignupRequestType, LoginRequestType} from "../types/auth.types.js";
 
 
 
-export const handlerSignup = async (req: Request<{},{},SignupBody>, res: Response, next: NextFunction) : Promise<void> => {
+export const handlerSignup = async (req: Request<{},{},SignupRequestType>, res: Response, next: NextFunction) : Promise<void> => {
+
     const { password, email, ...restOfBody } = req.body;
 
     try {
@@ -15,7 +16,7 @@ export const handlerSignup = async (req: Request<{},{},SignupBody>, res: Respons
     }
 };
 
-export const handlerLogin = async (req: Request<{}, {}, LoginBody>, res: Response, next: NextFunction) : Promise<void> => {
+export const handlerLogin = async (req: Request<{}, {}, LoginRequestType>, res: Response, next: NextFunction) : Promise<void> => {
     const { email, password } = req.body;
 
     try {
@@ -31,7 +32,6 @@ export const handlerLogin = async (req: Request<{}, {}, LoginBody>, res: Respons
 
 export const handlerLogout = (req: Request, res: Response, next: NextFunction) : void => {
     try {
-        
         req.session.destroy((err) => {
             if (err) {
                 return next(err);
