@@ -1,10 +1,11 @@
-import type { SignupBody } from "../types/auth.types.js";
+import type { SignupRequestBody } from "../types/auth.types.js";
 import { findUserByEmail } from "../repositories/auth.repository.js";
 import { createUser, createUserLocalAccount } from "../repositories/auth.repository.js";
-import { prisma } from "../config/db.config.js";
 import * as bcrypt from 'bcrypt';
+import { prisma } from "../config/db.config.js";
 import { CustomError, ErrorCodes } from "../errors/customError.js";
 import type { SessionUserInfo } from "../types/auth.types.js";
+import { findRegionByCode } from "../repositories/region.repository.js";
 
 export const getLoginInfo = async (email: string) => {
     const user =  await findUserByEmail(email);
@@ -16,7 +17,7 @@ export const verifyPassword = async (inputPassword: string, storedPassword: stri
     return match;
 }
 
-export const signupUser = async (userData: SignupBody) => {
+export const signupUser = async (userData: SignupRequestBody) => {
 
     const hashedPassword = await bcrypt.hash(userData.password, 10);
 
@@ -24,9 +25,7 @@ export const signupUser = async (userData: SignupBody) => {
     if(existingUser) {
         throw new CustomError(409, ErrorCodes.RESOURCE_ALREADY_EXISTS, '이미 존재하는 이메일입니다.');
     }
-    const region = await prisma.region.findUnique({
-        where: { region_code: userData.region_code }
-    });
+    const region = await findRegionByCode(userData.region_code);
     if(!region) {
         throw new CustomError(400, ErrorCodes.RESOURCE_NOT_FOUND, '유효하지 않은 지역 코드입니다.');
     }

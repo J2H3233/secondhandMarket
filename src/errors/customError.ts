@@ -10,7 +10,7 @@ class CustomError extends Error {
 
         this.code = code || ErrorCodes.UNKNOWN_ERROR;
         this.httpStatus = httpStatus;
-
+        Object.setPrototypeOf(this, CustomError.prototype);
     }
 }
 
