@@ -12,7 +12,9 @@ export const createUserLocalAccount = async (email: string, passwordHash: string
         data: {
             email: email,
             password_hash: passwordHash,
-            user_id: userId
+            user : {
+                connect: { id: userId }
+            }
         }
     });
 }
@@ -22,7 +24,9 @@ export const createUser = async (username: string, phone_num: string, region_id:
         data: {
             username: username,
             phone_num: phone_num,
-            region_id: region_id
+            region : {
+                connect: { id: region_id }
+            }
         }
     });
 };

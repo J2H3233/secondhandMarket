@@ -1,4 +1,4 @@
-export interface SignupBody {
+export interface SignupRequestBody {
     username: string;
     password: string;
     email: string;
@@ -6,11 +6,11 @@ export interface SignupBody {
     region_code: string;
 }
 
-export interface LoginBody {
+export interface LoginRequestBody {
     email: string;
     password: string;
 }
 
 export interface SessionUserInfo {
-    email: string;
+    userId?: number;
 }

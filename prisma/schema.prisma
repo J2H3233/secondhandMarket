@@ -111,7 +111,7 @@ model category {
   id                      Int             @id @default(autoincrement())
   created_at              DateTime        @default(now()) @db.Timestamp(0)
   updated_at              DateTime        @default(now()) @db.Timestamp(0)
-  category_name           String?         @db.VarChar(20) // category 필드명을 category_name으로 변경 (필드명과 모델명 충돌 방지)
+  category_name           String?         @db.VarChar(20) 
   parent_id               Int?
 
   // 관계 필드 (순방향): 부모 카테고리 참조
