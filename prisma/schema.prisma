@@ -29,7 +29,7 @@ enum TradeStatus {
 }
 
 // message.message_type
-enum MessageMessageType {
+enum MessageType {
   NORMAL
   PENDING
   IN_PERSON
@@ -68,6 +68,7 @@ model user {
   updated_at              DateTime            @default(now()) @db.Timestamp(0)
   profile_url             String?             @db.VarChar(512)
   phone_num               String?             @db.VarChar(20)
+  is_deleted              boolean             @default(false)
   deleted_at              DateTime?           @db.Timestamp(0)
 
   // 관계 필드 (순방향): user의 지역 정보
@@ -89,7 +90,7 @@ model user {
 // =========================================================
 model user_local_account {
   id            Int      @id @default(autoincrement())
-  user_id       Int
+  user_id       Int      @unique
   email         String   @unique @db.VarChar(255) 
   password_hash String   @db.VarChar(255)
   created_at    DateTime @default(now()) @db.Timestamp(0)
@@ -111,7 +112,7 @@ model category {
   id                      Int             @id @default(autoincrement())
   created_at              DateTime        @default(now()) @db.Timestamp(0)
   updated_at              DateTime        @default(now()) @db.Timestamp(0)
-  category_name           String?         @db.VarChar(20) 
+  category_name           String          @db.VarChar(20) 
   parent_id               Int?
 
   // 관계 필드 (순방향): 부모 카테고리 참조
@@ -143,10 +144,10 @@ model post {
   delivery_charge   Int?
   transaction_type  PostTransactionType?
   content           String?                 @db.Text
-  views             Int?                    @default(0)
-  is_deleted        Boolean?                @default(false)
+  views             Int                     @default(0)
+  is_deleted        Boolean                 @default(false)
   deleted_at        DateTime?               @db.Timestamp(0)
-  title             String?                 @db.VarChar(100)
+  title             String                  @db.VarChar(100)
 
   // 관계 필드 (순방향):
   region            region                  @relation(fields: [region_id], references: [id], map: "FK_region_TO_post_1")
@@ -174,7 +175,7 @@ model post_img {
   post_id    Int
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
-  url        String?  @db.VarChar(512)
+  url        String   @db.VarChar(512)
 
   // 관계 필드
   post       post     @relation(fields: [post_id], references: [id], map: "FK_post_TO_post_img_1")
@@ -262,7 +263,7 @@ model trade {
 model trade_record {
   id         Int      @id @default(autoincrement())
   trade_id   Int
-  amount     Int?
+  amount     Int 
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
 
@@ -287,8 +288,8 @@ model review {
   post_id         Int
   created_at      DateTime @default(now()) @db.Timestamp(0)
   updated_at      DateTime @default(now()) @db.Timestamp(0)
-  rating          Int?
-  content         String?  @db.Text
+  rating          Int 
+  content         String   @db.Text
 
   // 관계 필드
   trade_record    trade_record @relation(fields: [trade_record_id], references: [id], map: "FK_trade_record_TO_review_1")
@@ -312,7 +313,7 @@ model review_img {
   review_id  Int
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
-  url        String?  @db.VarChar(512)
+  url        String   @db.VarChar(512)
 
   // 관계 필드
   review     review   @relation(fields: [review_id], references: [id], map: "FK_review_TO_review_img_1")
@@ -329,7 +330,7 @@ model review_img {
 model chatroom {
   id         Int       @id @default(autoincrement())
   trade_id   Int
-  is_close   Boolean?
+  is_close   Boolean   @default(false)
   closed_at  DateTime? @db.Timestamp(0)
   created_at DateTime  @default(now()) @db.Timestamp(0)
   updated_at DateTime  @default(now()) @db.Timestamp(0)
@@ -350,21 +351,42 @@ model chatroom {
 // 14. message (메시지)
 // =========================================================
 model message {
-  id             Int                    @id @default(autoincrement())
+  id             Int                     @id @default(autoincrement())
   sender_id      Int
   chat_room_id   Int
-  created_at     DateTime               @default(now()) @db.Timestamp(0)
-  updated_at     DateTime               @default(now()) @db.Timestamp(0)
-  message_type   MessageMessageType     @default(NORMAL)
-  content        String?                @db.Text
+  created_at     DateTime                @default(now()) @db.Timestamp(0)
+  updated_at     DateTime                @default(now()) @db.Timestamp(0)
+  message_type   MessageType             @default(NORMAL)
+  content        String?                 @db.Text
 
   // 관계 필드
-  sender         user                   @relation(fields: [sender_id], references: [id], map: "FK_user_TO_message_1")
-  chat_room      chatroom               @relation(fields: [chat_room_id], references: [id], map: "FK_chatroom_TO_message_1")
+  sender         user                    @relation(fields: [sender_id], references: [id], map: "FK_user_TO_message_1")
+  chat_room      chatroom                @relation(fields: [chat_room_id], references: [id], map: "FK_chatroom_TO_message_1")
+
+  // 역참조 관계 (1:1):
+  message_img    message_img? 
 
   // 외래키 인덱스
   @@index([sender_id], map: "FK_user_TO_message_1")
   @@index([chat_room_id], map: "FK_chatroom_TO_message_1")
 
   @@map("message")
+}
+// =========================================================
+// 15. message_img (메시지 이미지)
+// =========================================================
+model message_img {
+  id           Int      @id @default(autoincrement())
+  message_id   Int      @unique // <--- 이 부분이 핵심입니다! message_id가 고유해야 합니다.
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+  url          String?  @db.VarChar(512) // 이미지 저장 경로 (URL)
+
+  // 관계 필드 (순방향): 1:1 관계를 위해 `message` 필드도 필수로 변경합니다.
+  message      message  @relation(fields: [message_id], references: [id], map: "FK_message_TO_message_img_1")
+
+  // 외래키 인덱스
+  @@index([message_id], map: "FK_message_TO_message_img_1")
+
+  @@map("message_img")
 }
