@@ -9,6 +9,7 @@ export const findRegionById = async (id: number, client: DBClient = prisma) => {
             where: { id: id }
         });
     } catch (error) {
+        console.error(error);
         throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '지역 조회시 db 오류가 발생했습니다.');
     }
 }
@@ -25,6 +26,7 @@ export const createRegion = async (sido: string, sigungu: string, eubmyeonli: st
             }
         });
     }catch (error) {
+        console.error(error);
         throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '지역 생성시 db 오류가 발생했습니다.');
     }
 }
@@ -35,6 +37,7 @@ export const findRegionByCode = async (region_code: string, client: DBClient = p
             where: { region_code: region_code }
         });
     } catch (error) {
+        console.error(error);
         throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '지역 코드 조회시 db 오류가 발생했습니다.');
     }
 }
@@ -48,6 +51,7 @@ export const existRegionByCode = async (region_code: string, client: DBClient = 
         return region !== null;
     }
     catch (error) {
+        console.error(error);
         throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '지역 코드 존재 여부 조회시 db 오류가 발생했습니다.');
     }   
 }

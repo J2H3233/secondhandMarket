@@ -11,33 +11,35 @@ const router : Router = Router();
  * @swagger
  * components:
  *   schemas:
- *     Region:
+ *     CreateRegionRequest:
  *       type: object
  *       required:
- *         - name
+ *         - sido
+ *         - sigungu
+ *         - eubmyeonli
+ *         - region_code
  *       properties:
- *         id:
- *           type: integer
- *           description: The auto-generated id of the region
- *         name:
+ *         sido:
  *           type: string
- *           description: The name of the region
- *         createdAt:
+ *           example: "서울특별시"
+ *         sigungu:
  *           type: string
- *           format: date-time
- *           description: The creation date
- *         updatedAt:
+ *           example: "강남구"
+ *         eubmyeonli:
  *           type: string
- *           format: date-time
- *           description: The last update date
+ *           example: "역삼동"
+ *         region_code:
+ *           type: string
+ *           example: "1168010100"
  */
 
 /**
  * @swagger
  * /api/region:
  *   post:
- *     summary: Create a new region
- *     tags: [Region]
+ *     tags:
+ *       - Region
+ *     summary: 지역 생성
  *     security:
  *       - bearerAuth: []
  *     requestBody:
@@ -45,45 +47,12 @@ const router : Router = Router();
  *       content:
  *         application/json:
  *           schema:
- *             type: object
- *             required:
- *               - sido
- *               - sigungu
- *               - eubmyeonli
- *               - region_code
- *             properties:
- *               sido:
- *                 type: string
- *                 description: The name of the region
- *               sigungu:
- *                 type: string
- *                 description: The name of the sub-region
- *               eubmyeonli:
- *                 type: string
- *                 description: The name of the smaller administrative unit
- *               region_code:
- *                 type: string
- *                 description: The unique code for the region
- *             example:
- *               sido: "Seoul"
- *               sigungu: "Gangnam-gu"
- *               eubmyeonli: "Yeoksam-dong"
- *               region_code: "12345"
+ *             $ref: '#/components/schemas/CreateRegionRequest'
  *     responses:
- *       201:
- *         description: Region created successfully
- *         content:
- *           application/json:
- *             schema:
- *               $ref: '#/components/schemas/Region'
- *       400:
- *         description: Bad request
- *       401:
- *         description: Unauthorized
- *       500:
- *         description: Internal server error
+ *       '200':
+ *         description: 요청 처리됨
  */
 
-router.post('/', checkLoggedIn as any, handlerCreateRegion as any);
+router.post('/', handlerCreateRegion as any);
 
 export default router;
