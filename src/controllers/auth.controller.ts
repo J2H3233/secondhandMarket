@@ -1,11 +1,10 @@
 import { signupUser, loginUser } from "../services/auth.service.js";
 import type { Request, Response, NextFunction } from "express";
-import type { SignupRequestType, LoginRequestType} from "../types/auth.types.js";
+import type { SignupRequestBody, LoginRequestBody} from "../types/auth.types.js";
 
 
 
-export const handlerSignup = async (req: Request<{},{},SignupRequestType>, res: Response, next: NextFunction) : Promise<void> => {
-
+export const handlerSignup = async (req: Request<{},{},SignupRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
     const { password, email, ...restOfBody } = req.body;
 
     try {
@@ -16,7 +15,7 @@ export const handlerSignup = async (req: Request<{},{},SignupRequestType>, res: 
     }
 };
 
-export const handlerLogin = async (req: Request<{}, {}, LoginRequestType>, res: Response, next: NextFunction) : Promise<void> => {
+export const handlerLogin = async (req: Request<{}, {}, LoginRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
     const { email, password } = req.body;
 
     try {
