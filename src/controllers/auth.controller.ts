@@ -5,7 +5,6 @@ import type { SignupRequestBody, LoginRequestBody} from "../types/auth.types.js"
 
 
 export const handlerSignup = async (req: Request<{},{},SignupRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
-
     const { password, email, ...restOfBody } = req.body;
 
     try {

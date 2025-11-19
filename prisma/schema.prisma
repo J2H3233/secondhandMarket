@@ -29,7 +29,7 @@ enum TradeStatus {
 }
 
 // message.message_type
-enum MessageMessageType {
+enum MessageType {
   NORMAL
   PENDING
   IN_PERSON
@@ -345,4 +345,22 @@ model message {
   @@index([trade_id], map: "FK_trade_TO_message_1") // 인덱스 맵 이름 업데이트
 
   @@map("message")
+}
+// =========================================================
+// 15. message_img (메시지 이미지)
+// =========================================================
+model message_img {
+  id           Int      @id @default(autoincrement())
+  message_id   Int      @unique // <--- 이 부분이 핵심입니다! message_id가 고유해야 합니다.
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+  url          String?  @db.VarChar(512) // 이미지 저장 경로 (URL)
+
+  // 관계 필드 (순방향): 1:1 관계를 위해 `message` 필드도 필수로 변경합니다.
+  message      message  @relation(fields: [message_id], references: [id], map: "FK_message_TO_message_img_1")
+
+  // 외래키 인덱스
+  @@index([message_id], map: "FK_message_TO_message_img_1")
+
+  @@map("message_img")
 }
