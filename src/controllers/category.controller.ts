@@ -1,10 +1,9 @@
 import type { Request, Response, NextFunction } from "express";
-import type { CreateCategoryBody } from "../types/category.type.js";
+import type { CreateCategoryRequestBody } from "../types/category.type.js";
 import { addCategory } from "../services/category.service.js";
 
 
-export const handlerCreateCategory = async (req: Request<{}, {}, CreateCategoryBody>, res: Response, next: NextFunction) : Promise<void> => {
-
+export const handlerCreateCategory = async (req: Request<{}, {}, CreateCategoryRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
     const { category_name, parent_name } = req.body;
 
     try {

@@ -9,7 +9,7 @@ const storage = multer.diskStorage({
     destination: (req, file, cb) => {
         // 이미지를 저장할 로컬 폴더 경로
         // 서버 시작 전에 이 폴더가 존재해야 합니다.
-        cb(null, 'uploads/post_images/'); 
+        cb(null, '../uploads/images'); 
     },
     filename: (req, file, cb) => {
         // 파일 이름 설정: "원본이름_타임스탬프.확장자" 형태로 저장

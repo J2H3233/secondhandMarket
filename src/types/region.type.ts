@@ -1,6 +1,6 @@
 
 
-export interface RegionInput {
+export interface CreateRegionRequestBody {
     sido: string;
     sigungu: string;
     eubmyeonli: string;

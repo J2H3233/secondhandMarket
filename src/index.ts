@@ -35,6 +35,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json()); 
 app.use(responseHandler as any);
 
+// app.use('/static', express.static('../uploads') as any);
 
 app.use(session({
     secret: process.env.SESSION_SECRET || 'no_key', 

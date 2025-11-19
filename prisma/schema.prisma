@@ -21,7 +21,7 @@ enum PostTransactionType {
 
 // trade.status
 enum TradeStatus {
-  PENDING   // 거래전
+  PENDING   // 협의중
   IN_PERSON // 직거래중
   SHIPPING  // 배송중
   CANCELED  // 거래취소
@@ -53,6 +53,8 @@ model region {
   // 역참조 관계
   user         user[]
   post         post[]
+  // trade_record에 대한 역참조는 단방향 연결을 위해 @ignore 처리
+  trade_record trade_record[] @ignore 
 
   @@map("region")
 }
@@ -61,42 +63,44 @@ model region {
 // 2. user (사용자)
 // =========================================================
 model user {
-  id                      Int                 @id @default(autoincrement())
-  region_id               Int
-  username                String              @db.VarChar(20)
-  created_at              DateTime            @default(now()) @db.Timestamp(0)
-  updated_at              DateTime            @default(now()) @db.Timestamp(0)
-  profile_url             String?             @db.VarChar(512)
-  phone_num               String?             @db.VarChar(20)
-  deleted_at              DateTime?           @db.Timestamp(0)
+  id                   Int           @id @default(autoincrement())
+  region_id            Int
+  username             String        @db.VarChar(20)
+  created_at           DateTime      @default(now()) @db.Timestamp(0)
+  updated_at           DateTime      @default(now()) @db.Timestamp(0)
+  profile_url          String?       @db.VarChar(512)
+  phone_num            String?       @db.VarChar(20)
+  deleted_at           DateTime?     @db.Timestamp(0)
 
   // 관계 필드 (순방향): user의 지역 정보
-  region                  region              @relation(fields: [region_id], references: [id], map: "FK_region_TO_user_1")
+  region               region        @relation(fields: [region_id], references: [id], map: "FK_region_TO_user_1")
 
   // 역참조 관계:
-  user_local_account      user_local_account[]
-  post_following          post_following[]    // 찜한 게시글
-  message                 message[]
-  posts_written           post[]              @relation("UserToPost") // 작성한 게시글
-  trades_as_buyer         trade[]             @relation("BuyerTrades") // 구매자로서의 거래
-  trades_as_seller        trade[]             @relation("SellerTrades") // 판매자로서의 거래
+  user_local_account   user_local_account? // 1:1 관계 (필수 아님)
+  post_following       post_following[]    // 찜한 게시글
+  message              message[]           // 보낸 메시지
+  posts_written        post[]              @relation("UserToPost") // 작성한 게시글
+  trades_as_buyer      trade[]             @relation("BuyerTrades") // 구매자로서의 거래
+  trades_as_seller     trade[]             @relation("SellerTrades") // 판매자로서의 거래
   
   @@map("user")
 }
 
 // =========================================================
 // 3. user_local_account (사용자 로컬 계정)
+// 
+// user와 1:1 관계로 설정: user_id에 @unique 추가
 // =========================================================
 model user_local_account {
-  id            Int      @id @default(autoincrement())
-  user_id       Int
-  email         String   @unique @db.VarChar(255) 
-  password_hash String   @db.VarChar(255)
-  created_at    DateTime @default(now()) @db.Timestamp(0)
-  updated_at    DateTime @default(now()) @db.Timestamp(0)
+  id             Int      @id @default(autoincrement())
+  user_id        Int      @unique // 1:1 관계를 위해 unique 설정
+  email          String   @unique @db.VarChar(255) 
+  password_hash  String   @db.VarChar(255)
+  created_at     DateTime @default(now()) @db.Timestamp(0)
+  updated_at     DateTime @default(now()) @db.Timestamp(0)
 
   // 관계 필드
-  user          user     @relation(fields: [user_id], references: [id], map: "FK_user_TO_user_local_account_1")
+  user           user     @relation(fields: [user_id], references: [id], map: "FK_user_TO_user_local_account_1")
 
   // 외래키 인덱스
   @@index([user_id], map: "FK_user_TO_user_local_account_1")
@@ -108,20 +112,20 @@ model user_local_account {
 // 4. category (카테고리)
 // =========================================================
 model category {
-  id                      Int             @id @default(autoincrement())
-  created_at              DateTime        @default(now()) @db.Timestamp(0)
-  updated_at              DateTime        @default(now()) @db.Timestamp(0)
-  category_name           String?         @db.VarChar(20) 
-  parent_id               Int?
+  id                   Int             @id @default(autoincrement())
+  created_at           DateTime        @default(now()) @db.Timestamp(0)
+  updated_at           DateTime        @default(now()) @db.Timestamp(0)
+  category_name        String?         @db.VarChar(20) 
+  parent_id            Int?
 
   // 관계 필드 (순방향): 부모 카테고리 참조
-  parent_category         category?       @relation("CategoryToCategory", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_category_TO_category_1")
+  parent_category      category?       @relation("CategoryToCategory", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_category_TO_category_1")
 
   // 역참조 관계: 자식 카테고리 목록
-  child_categories        category[]      @relation("CategoryToCategory") 
+  child_categories     category[]      @relation("CategoryToCategory") 
   
-  // 역참조 관계: 이 카테고리에 속하는 게시글 연결 목록
-  category_post           category_post[] 
+  // 역참조 관계: 이 카테고리에 속하는 게시글 목록 (직접 연결)
+  post                 post[] 
 
   // 외래키 인덱스
   @@index([parent_id], map: "FK_category_TO_category_1")
@@ -131,37 +135,42 @@ model category {
 
 // =========================================================
 // 5. post (게시글)
+// 
+// category_id 필드 추가 및 category_post 제거
 // =========================================================
 model post {
-  id                Int                     @id @default(autoincrement())
-  region_id         Int
-  posting_user_id   Int
-  created_at        DateTime                @default(now()) @db.Timestamp(0)
-  updated_at        DateTime                @default(now()) @db.Timestamp(0)
-  status            PostStatus              @default(OPEN)
-  price             Int?
-  delivery_charge   Int?
-  transaction_type  PostTransactionType?
-  content           String?                 @db.Text
-  views             Int?                    @default(0)
-  is_deleted        Boolean?                @default(false)
-  deleted_at        DateTime?               @db.Timestamp(0)
-  title             String?                 @db.VarChar(100)
+  id                 Int                  @id @default(autoincrement())
+  region_id          Int
+  posting_user_id    Int
+  category_id        Int?                 // 카테고리 직접 연결
+  created_at         DateTime             @default(now()) @db.Timestamp(0)
+  updated_at         DateTime             @default(now()) @db.Timestamp(0)
+  status             PostStatus           @default(OPEN)
+  price              Int?
+  delivery_charge    Int?
+  transaction_type   PostTransactionType?
+  content            String?              @db.Text
+  views              Int?                 @default(0)
+  is_deleted         Boolean?             @default(false)
+  deleted_at         DateTime?            @db.Timestamp(0)
+  title              String?              @db.VarChar(100)
 
   // 관계 필드 (순방향):
-  region            region                  @relation(fields: [region_id], references: [id], map: "FK_region_TO_post_1")
-  posting_user      user                    @relation("UserToPost", fields: [posting_user_id], references: [id], map: "FK_user_TO_post_1")
+  region             region               @relation(fields: [region_id], references: [id], map: "FK_region_TO_post_1")
+  posting_user       user                 @relation("UserToPost", fields: [posting_user_id], references: [id], map: "FK_user_TO_post_1")
+  category           category?            @relation(fields: [category_id], references: [id], map: "FK_category_TO_post_1") // 카테고리 참조
 
   // 역참조 관계:
-  post_img          post_img[]
-  post_following    post_following[]        // 이 게시글을 찜한 사람들
-  review            review[]
-  trade             trade[]                 // 이 게시글에 대한 거래 목록
-  category_post     category_post[]         // 이 게시글의 카테고리 연결 목록
+  post_img           post_img[]
+  post_following     post_following[]     // 이 게시글을 찜한 사람들
+  review             review[]
+  trade              trade[]              // 이 게시글에 대한 거래 목록
+  // category_post 제거
 
   // 외래키 인덱스
   @@index([region_id], map: "FK_region_TO_post_1")
   @@index([posting_user_id], map: "FK_user_TO_post_1")
+  @@index([category_id], map: "FK_category_TO_post_1")
   
   @@map("post")
 }
@@ -170,14 +179,14 @@ model post {
 // 6. post_img (게시글 이미지)
 // =========================================================
 model post_img {
-  id         Int      @id @default(autoincrement())
-  post_id    Int
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
-  url        String?  @db.VarChar(512)
+  id           Int      @id @default(autoincrement())
+  post_id      Int
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+  url          String?  @db.VarChar(512)
 
   // 관계 필드
-  post       post     @relation(fields: [post_id], references: [id], map: "FK_post_TO_post_img_1")
+  post         post     @relation(fields: [post_id], references: [id], map: "FK_post_TO_post_img_1")
 
   // 외래키 인덱스
   @@index([post_id], map: "FK_post_TO_post_img_1")
@@ -189,15 +198,15 @@ model post_img {
 // 7. post_following (게시글 찜)
 // =========================================================
 model post_following {
-  id         Int      @id @default(autoincrement())
-  user_id    Int
-  post_id    Int
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
+  id           Int      @id @default(autoincrement())
+  user_id      Int
+  post_id      Int
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
 
   // 관계 필드
-  user       user     @relation(fields: [user_id], references: [id], map: "FK_user_TO_post_following_1")
-  post       post     @relation(fields: [post_id], references: [id], map: "FK_post_TO_post_following_1")
+  user         user     @relation(fields: [user_id], references: [id], map: "FK_user_TO_post_following_1")
+  post         post     @relation(fields: [post_id], references: [id], map: "FK_post_TO_post_following_1")
   
   // 외래키 인덱스
   @@index([user_id], map: "FK_user_TO_post_following_1")
@@ -207,46 +216,34 @@ model post_following {
 }
 
 // =========================================================
-// 8. category_post (게시글-카테고리 연결)
+// 8. category_post (게시글-카테고리 연결) - 삭제됨
 // =========================================================
-model category_post {
-  id          BigInt   @id @default(autoincrement())
-  category_id Int
-  post_id     Int
-  created_at  DateTime @default(now()) @db.Timestamp(0)
-  updated_at  DateTime @default(now()) @db.Timestamp(0)
-
-  // 관계 필드
-  category    category @relation(fields: [category_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_category_TO_category_post_1")
-  post        post     @relation(fields: [post_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_post_TO_category_post_1")
-  
-  // 외래키 인덱스
-  @@index([category_id], map: "FK_category_TO_category_post_1")
-  @@index([post_id], map: "FK_post_TO_category_post_1")
-
-  @@map("category_post")
-}
+/* model category_post {
+  // ... (삭제됨)
+} */
 
 // =========================================================
-// 9. trade (거래)
+// 9. trade (거래 및 채팅방 통합)
 // =========================================================
 model trade {
-  id          Int            @id @default(autoincrement())
-  post_id     Int
-  buyer_id    Int
-  seller_id   Int
-  status      TradeStatus
-  created_at  DateTime       @default(now()) @db.Timestamp(0)
-  updated_at  DateTime       @default(now()) @db.Timestamp(0)
+  id           Int           @id @default(autoincrement())
+  post_id      Int
+  buyer_id     Int
+  seller_id    Int
+  status       TradeStatus
+  is_close     Boolean?      @default(false) // (From chatroom) 채팅방 종료 여부
+  closed_at    DateTime?     @db.Timestamp(0) // (From chatroom) 채팅방 종료 시점
+  created_at   DateTime      @default(now()) @db.Timestamp(0)
+  updated_at   DateTime      @default(now()) @db.Timestamp(0)
 
   // 관계 필드 (순방향):
-  post        post           @relation(fields: [post_id], references: [id], map: "FK_post_TO_trade_1")
-  buyer       user           @relation("BuyerTrades", fields: [buyer_id], references: [id], map: "FK_user_TO_trade_1")
-  seller      user           @relation("SellerTrades", fields: [seller_id], references: [id], map: "FK_user_TO_trade_2")
+  post         post          @relation(fields: [post_id], references: [id], map: "FK_post_TO_trade_1")
+  buyer        user          @relation("BuyerTrades", fields: [buyer_id], references: [id], map: "FK_user_TO_trade_1")
+  seller       user          @relation("SellerTrades", fields: [seller_id], references: [id], map: "FK_user_TO_trade_2")
 
   // 역참조 관계:
   trade_record trade_record[]
-  chatroom    chatroom[]
+  message      message[]     // 이 거래(채팅방)에 속한 메시지 목록
 
   // 외래키 인덱스
   @@index([post_id], map: "FK_post_TO_trade_1")
@@ -260,20 +257,24 @@ model trade {
 // 10. trade_record (거래 기록)
 // =========================================================
 model trade_record {
-  id         Int      @id @default(autoincrement())
-  trade_id   Int
-  amount     Int?
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
+  id              Int      @id @default(autoincrement())
+  trade_id        Int
+  region_id       Int?     // 거래가 발생한 지역 정보
+  amount          Int?
+  address_detail  String?  @db.VarChar(255) // 상세 주소
+  created_at      DateTime @default(now()) @db.Timestamp(0)
+  updated_at      DateTime @default(now()) @db.Timestamp(0)
 
-  // 관계 필드
-  trade      trade    @relation(fields: [trade_id], references: [id], map: "FK_trade_TO_trade_record_1")
+  // 관계 필드 (region을 단방향으로 참조)
+  trade           trade    @relation(fields: [trade_id], references: [id], map: "FK_trade_TO_trade_record_1")
+  region          region?  @relation(fields: [region_id], references: [id], map: "FK_region_TO_trade_record_1") 
 
   // 역참조 관계
-  review     review[]
+  review          review[]
 
   // 외래키 인덱스
   @@index([trade_id], map: "FK_trade_TO_trade_record_1")
+  @@index([region_id], map: "FK_region_TO_trade_record_1") 
 
   @@map("trade_record")
 }
@@ -282,13 +283,13 @@ model trade_record {
 // 11. review (리뷰)
 // =========================================================
 model review {
-  id              Int      @id @default(autoincrement())
+  id              Int          @id @default(autoincrement())
   trade_record_id Int
-  post_id         Int
+  post_id         Int          // 조회 성능을 위해 post_id를 유지
   created_at      DateTime @default(now()) @db.Timestamp(0)
   updated_at      DateTime @default(now()) @db.Timestamp(0)
   rating          Int?
-  content         String?  @db.Text
+  content         String?      @db.Text
 
   // 관계 필드
   trade_record    trade_record @relation(fields: [trade_record_id], references: [id], map: "FK_trade_record_TO_review_1")
@@ -308,14 +309,14 @@ model review {
 // 12. review_img (리뷰 이미지)
 // =========================================================
 model review_img {
-  id         Int      @id @default(autoincrement())
-  review_id  Int
-  created_at DateTime @default(now()) @db.Timestamp(0)
-  updated_at DateTime @default(now()) @db.Timestamp(0)
-  url        String?  @db.VarChar(512)
+  id           Int      @id @default(autoincrement())
+  review_id    Int
+  created_at   DateTime @default(now()) @db.Timestamp(0)
+  updated_at   DateTime @default(now()) @db.Timestamp(0)
+  url          String?  @db.VarChar(512)
 
   // 관계 필드
-  review     review   @relation(fields: [review_id], references: [id], map: "FK_review_TO_review_img_1")
+  review       review   @relation(fields: [review_id], references: [id], map: "FK_review_TO_review_img_1")
 
   // 외래키 인덱스
   @@index([review_id], map: "FK_review_TO_review_img_1")
@@ -324,47 +325,24 @@ model review_img {
 }
 
 // =========================================================
-// 13. chatroom (채팅방)
-// =========================================================
-model chatroom {
-  id         Int       @id @default(autoincrement())
-  trade_id   Int
-  is_close   Boolean?
-  closed_at  DateTime? @db.Timestamp(0)
-  created_at DateTime  @default(now()) @db.Timestamp(0)
-  updated_at DateTime  @default(now()) @db.Timestamp(0)
-
-  // 관계 필드
-  trade      trade     @relation(fields: [trade_id], references: [id], map: "FK_trade_TO_chatroom_1")
-
-  // 역참조 관계
-  message    message[]
-
-  // 외래키 인덱스
-  @@index([trade_id], map: "FK_trade_TO_chatroom_1")
-
-  @@map("chatroom")
-}
-
-// =========================================================
 // 14. message (메시지)
 // =========================================================
 model message {
-  id             Int                    @id @default(autoincrement())
-  sender_id      Int
-  chat_room_id   Int
-  created_at     DateTime               @default(now()) @db.Timestamp(0)
-  updated_at     DateTime               @default(now()) @db.Timestamp(0)
-  message_type   MessageMessageType     @default(NORMAL)
-  content        String?                @db.Text
+  id              Int                  @id @default(autoincrement())
+  sender_id       Int
+  trade_id        Int                  // chat_room_id -> trade_id 로 변경
+  created_at      DateTime             @default(now()) @db.Timestamp(0)
+  updated_at      DateTime             @default(now()) @db.Timestamp(0)
+  message_type    MessageMessageType   @default(NORMAL)
+  content         String?              @db.Text
 
   // 관계 필드
-  sender         user                   @relation(fields: [sender_id], references: [id], map: "FK_user_TO_message_1")
-  chat_room      chatroom               @relation(fields: [chat_room_id], references: [id], map: "FK_chatroom_TO_message_1")
+  sender          user                 @relation(fields: [sender_id], references: [id], map: "FK_user_TO_message_1")
+  trade           trade                @relation(fields: [trade_id], references: [id], map: "FK_trade_TO_message_1") // trade 를 참조하도록 관계 업데이트
 
   // 외래키 인덱스
   @@index([sender_id], map: "FK_user_TO_message_1")
-  @@index([chat_room_id], map: "FK_chatroom_TO_message_1")
+  @@index([trade_id], map: "FK_trade_TO_message_1") // 인덱스 맵 이름 업데이트
 
   @@map("message")
 }

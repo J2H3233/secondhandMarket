@@ -1,8 +1,9 @@
-import type { RegionInput } from '../types/region.type.js';
+import type { CreateRegionRequestBody } from '../types/region.type.js';
 import { createRegion, existRegionByCode } from '../repositories/region.repository.js';
 import { CustomError, ErrorCodes } from '../errors/customError.js';
+import { error } from 'console';
 
-export const addRegion = async (regionInput: RegionInput) => {
+export const addRegion = async (regionInput: CreateRegionRequestBody) => {
     
     const existionRegion : boolean = await existRegionByCode(regionInput.region_code);
     if(existionRegion) {

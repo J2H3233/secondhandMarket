@@ -1,8 +1,8 @@
 import type { Request, Response, NextFunction } from "express";
-import type { RegionInput } from "../types/region.type.js";
+import type { CreateRegionRequestBody } from "../types/region.type.js";
 import { addRegion } from "../services/region.services.js";
 
-export const handlerCreateRegion = async (req: Request<{}, {}, RegionInput>, res: Response, next: NextFunction) : Promise<void> => {
+export const handlerCreateRegion = async (req: Request<{}, {}, CreateRegionRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
     const { sido, sigungu, eubmyeonli, region_code } = req.body;
     try {
         const region = await addRegion({ sido, sigungu, eubmyeonli, region_code });

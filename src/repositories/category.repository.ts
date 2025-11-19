@@ -13,11 +13,9 @@ export const findCategoryByName = async (name: string, client: DBClient = prisma
         console.error(error);
         throw new CustomError(500, ErrorCodes.INTERNAL_SERVER_ERROR, '카테고리 조회 중 오류 발생');
     }
-
 }
 
 export const createCategory = async (name: string, parent_id: number | null, client: DBClient = prisma) => {
-    
     try{
         return await client.category.create({
             data: {
