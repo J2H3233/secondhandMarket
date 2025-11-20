@@ -12,6 +12,7 @@ import swaggerOptions from './config/swagger.config.js';
 import session from 'express-session';
 import { errorHandler } from './middlewares/errorHandler.js';
 import { responseHandler } from './middlewares/responseHandler.js';
+import expressLayouts from 'express-ejs-layouts';
 
 dotenv.config();
 
@@ -38,6 +39,10 @@ app.use(session({
 // EJS 뷰 엔진 설정
 app.set('view engine', 'ejs');
 app.set('views', path.join(process.cwd(), 'views'));
+
+// EJS 레이아웃 설정
+app.use(expressLayouts);
+app.set('layout', 'layout'); // layout.ejs 파일을 기본 레이아웃으로 설정
 
 // 정적 파일 제공 설정
 app.use(express.static(path.join(process.cwd(), 'public')) as any);

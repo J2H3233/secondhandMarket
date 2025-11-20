@@ -101,3 +101,4 @@ export const handlerCreateCategory = async (req: Request<{}, {}, CreateCategoryR
         next(error);
     }
 }   
+
