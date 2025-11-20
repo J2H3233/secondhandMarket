@@ -1,7 +1,7 @@
 import { prisma } from "../config/db.config.js";
 import { CustomError, ErrorCodes } from "../errors/customError.js";
 import type { SessionUserInfo } from "../types/auth.types.js";
-import { createPost, findPostById, softdeletePostById } from "../repositories/post.repository.js";
+import { createPost, findPostById, softdeletePostById, findPostDetailsById } from "../repositories/post.repository.js";
 import type { PostTransactionType } from "@prisma/client";
 import type { MulterFile } from "../types/image.types.js";
 
@@ -84,6 +84,17 @@ export const getPost = async (id: number, tx?: any): Promise<any> => {
         throw new CustomError(404, ErrorCodes.NOT_FOUND, '게시물을 찾을 수 없습니다.');
     }
     return post;     
+}
+
+export const getPostDetails = async (id: number): Promise<any> => {
+    const postDetails = await prisma.$transaction(async (tx) => {
+        const post = await findPostDetailsById(id, tx);
+        if (!post) {
+            throw new CustomError(404, ErrorCodes.NOT_FOUND, '게시물을 찾을 수 없습니다.');
+        }
+        return post;
+    });
+    return postDetails;
 }
 
 export const softdeletePostByIdService = async (id: number): Promise<any> => {

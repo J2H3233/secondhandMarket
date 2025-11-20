@@ -7,7 +7,9 @@ const router : Router = Router();
 
 router.get('/login', (req, res) => {
     res.render('login', { 
-        title: 'Login Page'
+        title: '로그인 - 한성마켓',
+        showHeader: false,
+        showFooter: false
     });
 });
 
@@ -15,7 +17,9 @@ router.post('/login', ssrhandlerLogin as any);
 
 router.get('/register', (req, res) => {
     res.render('register', { 
-        title: 'Register Page' 
+        title: '회원가입 - 한성마켓',
+        showHeader: false,
+        showFooter: false
     });
 }); 
 

@@ -21,7 +21,9 @@ router.get('/new', ssrCheckLoggedIn as any, (req, res) => {
     res.render('posting', { 
         title: '상품 등록 - 한성마켓',
         isLoggedIn: req.session.isLoggedIn || false,
-        user: req.session.userId ? { userId: req.session.userId } : null
+        user: req.session.userId ? { userId: req.session.userId } : null,
+        additionalCSS: ['/css/posting.css'],
+        showHeader: false // posting 페이지는 자체 헤더 사용
     });
 });
 
@@ -86,24 +88,6 @@ router.post('/create', ssrCheckLoggedIn as any, ssrhandlerCreatePost as any
 );
 
 // 게시글 상세 조회
-router.get('/:id', async (req, res) => {
-    const postId = Number(req.params.id);
-    try {
-        const post = await getPost(postId);
-        if (!post) {
-            res.status(404).send('게시물을 찾을 수 없습니다.');
-            return;
-        }
-        res.render('postDetail', {
-            title: post.title,
-            post: post,
-            isLoggedIn: req.session.isLoggedIn || false,
-            user: req.session.userId ? { userId: req.session.userId } : null
-        });
-    } catch (error) {
-        console.error('게시물 조회 오류:', error);
-        res.status(500).send('서버 오류가 발생했습니다.');
-    }
-});
+router.get('/:id', ssrhandlerGetPost as any);
 
 export default router;
