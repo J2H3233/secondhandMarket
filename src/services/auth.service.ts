@@ -30,7 +30,7 @@ export const signupUser = async (userData: SignupRequestBody) => {
         throw new CustomError(400, ErrorCodes.RESOURCE_NOT_FOUND, '유효하지 않은 지역 코드입니다.');
     }
     const newUser = await prisma.$transaction(async (tx) => {
-        const createdUser = await createUser(userData.username, userData.phone_num, region.id, tx);
+        const createdUser = await createUser(userData.username, userData.phone_num, region.id, userData.address_detail, tx);
         await createUserLocalAccount(userData.email, hashedPassword, createdUser.id, tx);
         return createdUser;
     });

@@ -1,5 +1,6 @@
 import { handlerSignup, handlerLogin, handlerLogout } from '../../controllers/auth.controller.js';
-import { Router } from 'express'; import { checkLoggedIn } from '../../middlewares/passport/auth.js';
+import { Router } from 'express'; 
+import { checkLoggedIn } from '../../middlewares/passport/auth.js';
 
 const router : Router = Router(); 
 
@@ -84,7 +85,7 @@ router.post('/signup', handlerSignup as any);
  *       '200':
  *         description: 요청 처리됨
  */
-router.post('/login', handlerLogin as any);
+router.post('/auth/login', handlerLogin as any);
 
 /**
  * @swagger

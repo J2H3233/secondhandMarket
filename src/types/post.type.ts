@@ -6,4 +6,5 @@ export interface CreatePostRequestBody {
     transaction_type: string;
     content: string;
     title: string;
+    category_name?: string;
 }
