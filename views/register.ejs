@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>회원가입 - 한성마켓</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="auth-container">
+  <div class="auth-header">
+    <h1><a href="/">한성마켓</a></h1>
+  </div>
+  
+  <div class="auth-form">
+    <h2>회원가입</h2>
+    
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <form method="POST" action="/auth/register">
+      <div class="form-group">
+        <label for="name">이름</label>
+        <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="email">이메일</label>
+        <input type="email" id="email" name="email" placeholder="이메일을 입력하세요" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="password">비밀번호</label>
+        <input type="password" id="password" name="password" placeholder="비밀번호를 입력하세요" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="phone">전화번호</label>
+        <input type="tel" id="phone" name="phone" placeholder="전화번호를 입력하세요" required>
+      </div>
+      
+      <div class="form-group">
+        <label for="regionCode">지역코드</label>
+        <input type="text" id="regionCode" name="regionCode" placeholder="10자리 지역코드를 입력하세요" pattern="[0-9]{10}" maxlength="10" required>
+        <small class="form-help">예: 1100000000 (서울특별시)</small>
+      </div>
+      
+      <div class="form-group">
+        <label for="addressDetail">세부 주소</label>
+        <input type="text" id="addressDetail" name="addressDetail" placeholder="상세 주소를 입력하세요 (예: 서울시 성북구 삼선교로 16길)" maxlength="100">
+        <small class="form-help">선택사항: 더 구체적인 주소를 입력해주세요</small>
+      </div>
+      
+      <button type="submit" class="btn btn-primary btn-full">회원가입</button>
+    </form>
+    
+    <div class="auth-switch">
+      <p>이미 계정이 있으신가요? <a href="/auth/login">로그인</a></p>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -4,6 +4,7 @@ export interface SignupRequestBody {
     email: string;
     phone_num: string;
     region_code: string;
+    address_detail?: string;
 }
 
 export interface LoginRequestBody {

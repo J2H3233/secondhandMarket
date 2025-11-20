@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>상품 등록 - 한성마켓</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/posting.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<div class="posting-container">
+  <div class="posting-header">
+    <h1><a href="/"><i class="fas fa-arrow-left"></i> 한성마켓</a></h1>
+    <h2>상품 등록</h2>
+  </div>
+  
+  <div class="posting-form">
+    <% if (typeof error !== 'undefined' && error) { %>
+      <div class="alert alert-error">
+        <%= error %>
+      </div>
+    <% } %>
+    
+    <!-- <form method="POST" action="/post/create" enctype="multipart/form-data">
+      
+      <div class="form-section">
+        <h3><i class="fas fa-images"></i> 상품 이미지</h3>
+        <div class="image-upload-area">
+          <div class="image-preview-container">
+            <div class="image-upload-box" onclick="document.getElementById('images').click()">
+              <i class="fas fa-camera"></i>
+              <p>사진을 등록해주세요</p>
+              <span class="image-count">0/5</span>
+            </div>
+          </div>
+          <input type="file" id="images" name="images" multiple accept="image/*" style="display: none;" onchange="previewImages(this)">
+          <p class="upload-help">최대 5장까지 등록 가능합니다.</p>
+        </div>
+      </div> -->
+
+      <form method="POST" action="/post/create" >
+      <!-- 상품 기본 정보 -->
+      <div class="form-section">
+        <h3><i class="fas fa-info-circle"></i> 상품 정보</h3>
+        
+        <div class="form-group">
+          <label for="title">제목 <span class="required">*</span></label>
+          <input type="text" id="title" name="title" placeholder="상품명을 입력해주세요" maxlength="100" required>
+          <div class="char-count">0/100</div>
+        </div>
+        
+        <div class="form-group">
+          <label for="category_name">카테고리 <span class="required">*</span></label>
+          <select id="category_name" name="category_name" required>
+            <option value="">카테고리를 선택해주세요</option>
+            <option value="전자기기">전자기기</option>
+            <option value="의류/패션">의류/패션</option>
+            <option value="도서/문구">도서/문구</option>
+            <option value="생활용품">생활용품</option>
+            <option value="스포츠/레저">스포츠/레저</option>
+            <option value="뷰티/화장품">뷰티/화장품</option>
+            <option value="식품">식품</option>
+            <option value="기타">기타</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label for="content">상품 설명 <span class="required">*</span></label>
+          <textarea id="content" name="content" placeholder="상품에 대해 자세히 설명해주세요&#10;&#10;• 상품 상태&#10;• 구매 시기&#10;• 사용감&#10;• 교환/환불 가능 여부 등" rows="8" required></textarea>
+          <div class="char-count">0/2000</div>
+        </div>
+      </div>
+
+      <!-- 가격 정보 -->
+      <div class="form-section">
+        <h3><i class="fas fa-won-sign"></i> 가격 정보</h3>
+        
+        <div class="form-group">
+          <label for="price">판매가격 <span class="required">*</span></label>
+          <div class="price-input-group">
+            <input type="number" id="price" name="price" placeholder="가격을 입력해주세요" min="0" max="99999999" required>
+            <span class="price-unit">원</span>
+          </div>
+        </div>
+        
+        <div class="form-group">
+          <label>배송비</label>
+          <div class="delivery-options">
+            <label class="radio-option">
+              <input type="radio" name="delivery_option" value="free" checked onchange="updateDeliveryCharge()">
+              <span><i class="fas fa-shipping-fast"></i> 무료배송</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="delivery_option" value="charged" onchange="updateDeliveryCharge()">
+              <span><i class="fas fa-won-sign"></i> 배송비 별도</span>
+            </label>
+          </div>
+          <div class="delivery-charge-input" style="display: none;">
+            <div class="price-input-group">
+              <input type="number" id="delivery_charge_input" placeholder="배송비를 입력해주세요" min="0" max="999999">
+              <span class="price-unit">원</span>
+            </div>
+          </div>
+          <!-- 실제 전송될 hidden input -->
+          <input type="hidden" id="delivery_charge" name="delivery_charge" value="0">
+        </div>
+      </div>
+
+      <!-- 거래 방식 -->
+      <div class="form-section">
+        <h3><i class="fas fa-handshake"></i> 거래 방식</h3>
+        
+        <div class="form-group">
+          <label for="transaction_type">거래 방식 <span class="required">*</span></label>
+          <div class="transaction-options">
+            <label class="radio-option">
+              <input type="radio" name="transaction_type" value="IN_PERSON" required>
+              <span><i class="fas fa-handshake"></i> 직거래</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="transaction_type" value="PARCEL" required>
+              <span><i class="fas fa-box"></i> 택배</span>
+            </label>
+          </div>
+        </div>
+      </div>
+
+      <!-- 거래 지역 -->
+      <div class="form-section">
+        <h3><i class="fas fa-map-marker-alt"></i> 거래 지역</h3>
+        
+        <div class="form-group">
+          <label for="region_code">지역코드 <span class="required">*</span></label>
+          <input type="text" id="region_code" name="region_code" placeholder="10자리 지역코드를 입력하세요" pattern="[0-9]{10}" maxlength="10" required>
+          <div class="form-help">예: 1100000000 (서울특별시)</div>
+        </div>
+      </div>
+
+      <!-- 버튼 그룹 -->
+      <div class="form-actions">
+        <button type="button" class="btn btn-outline" onclick="history.back()">취소</button>
+        <button type="submit" class="btn btn-primary">상품 등록</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+// 이미지 미리보기 기능
+function previewImages(input) {
+  const container = document.querySelector('.image-preview-container');
+  const countSpan = document.querySelector('.image-count');
+  
+  // 기존 미리보기 제거 (첫 번째 업로드 박스 제외)
+  const existingPreviews = container.querySelectorAll('.image-preview');
+  existingPreviews.forEach(preview => preview.remove());
+  
+  const files = Array.from(input.files).slice(0, 5); // 최대 5장
+  countSpan.textContent = `${files.length}/5`;
+  
+  files.forEach((file, index) => {
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const preview = document.createElement('div');
+      preview.className = 'image-preview';
+      preview.innerHTML = `
+        <img src="${e.target.result}" alt="미리보기 ${index + 1}">
+        <button type="button" class="remove-image" onclick="removeImage(${index})">
+          <i class="fas fa-times"></i>
+        </button>
+      `;
+      container.appendChild(preview);
+    };
+    reader.readAsDataURL(file);
+  });
+}
+
+// 이미지 제거 기능
+function removeImage(index) {
+  const input = document.getElementById('images');
+  const dt = new DataTransfer();
+  const files = Array.from(input.files);
+  
+  files.splice(index, 1);
+  files.forEach(file => dt.items.add(file));
+  
+  input.files = dt.files;
+  previewImages(input);
+}
+
+// 배송비 입력 필드 토글 및 값 설정
+function updateDeliveryCharge() {
+  const deliveryOption = document.querySelector('input[name="delivery_option"]:checked').value;
+  const deliveryChargeInput = document.querySelector('.delivery-charge-input');
+  const deliveryChargeField = document.getElementById('delivery_charge');
+  const deliveryChargeInputField = document.getElementById('delivery_charge_input');
+  
+  if (deliveryOption === 'charged') {
+    deliveryChargeInput.style.display = 'block';
+    deliveryChargeInputField.required = true;
+    // 입력 필드 값이 변경될 때마다 hidden input 업데이트
+    deliveryChargeInputField.addEventListener('input', function() {
+      deliveryChargeField.value = this.value || '0';
+    });
+  } else {
+    deliveryChargeInput.style.display = 'none';
+    deliveryChargeInputField.required = false;
+    deliveryChargeInputField.value = '';
+    deliveryChargeField.value = '0'; // 무료배송이면 0
+  }
+}
+
+// 글자 수 카운터
+document.getElementById('title').addEventListener('input', function() {
+  const counter = this.parentNode.querySelector('.char-count');
+  counter.textContent = `${this.value.length}/100`;
+});
+
+document.getElementById('content').addEventListener('input', function() {
+  const counter = this.parentNode.querySelector('.char-count');
+  counter.textContent = `${this.value.length}/2000`;
+});
+</script>
+
+</body>
+</html>

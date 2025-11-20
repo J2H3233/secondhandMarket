@@ -30,17 +30,24 @@ export const createUserLocalAccount = async (email: string, passwordHash: string
     }
 }
 
-export const createUser = async (username: string, phone_num: string, region_id: number, client: DBClient = prisma) => {
+export const createUser = async (username: string, phone_num: string, region_id: number, address_detail?: string, client: DBClient = prisma) => {
     try {
-        return await client.user.create({
-            data: {
-                username: username,
-                phone_num: phone_num,
-                region : {
-                    connect: { id: region_id }
-                }
+        const userData: any = {
+            username: username,
+            phone_num: phone_num,
+            region: {
+                connect: { id: region_id }
             }
-    });
+        };
+
+        // address_detail이 있을 때만 객체에 추가
+        if (address_detail !== undefined) {
+            userData.address_detail = address_detail;
+        }
+
+        return await client.user.create({
+            data: userData
+        });
     } catch (error) {
         console.error(error);
         throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '사용자 생성시 db 오류가 발생했습니다.');

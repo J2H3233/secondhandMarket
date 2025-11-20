@@ -12,6 +12,7 @@ export const createPost = async (
     transaction_type: PostTransactionType,
     content: string,
     title: string,
+    category_name: string | undefined,
     client: DBClient = prisma
 ) => {
     try {
@@ -23,6 +24,11 @@ export const createPost = async (
                 posting_user: {
                     connect: { id: posting_user_id }
                 },
+                ...(category_name && {
+                    category: {
+                        connect: { category_name: category_name }
+                    }
+                }),
                 price: price,
                 delivery_charge: delivery_charge,
                 transaction_type: transaction_type,

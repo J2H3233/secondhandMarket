@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>한성마켓 - 대학생 중고거래</title>
+  <link rel="stylesheet" href="/css/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+
+<!-- 헤더 -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">
+      <h1><a href="/"><i class="fas fa-store"></i> 한성마켓</a></h1>
+      <p class="tagline">중고거래 플랫폼</p>
+    </div>
+    
+    <nav class="nav-menu">
+      <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+        <a href="/post/new" class="btn btn-primary"><i class="fas fa-plus"></i> 상품등록</a>
+        <a href="/myshop" class="nav-link"><i class="fas fa-user"></i> 내상점</a>
+        <a href="/messages" class="nav-link"><i class="fas fa-comments"></i> 채팅</a>
+        <form action="/auth/logout" method="POST" style="display: inline;">
+          <button type="submit" class="nav-link" style="border: none; background: none; padding: 0; cursor: pointer;">
+            로그아웃
+          </button>
+        </form>
+      <% } else { %>
+        <a href="/auth/login" class="btn btn-outline">로그인</a>
+        <a href="/auth/register" class="btn btn-primary">회원가입</a>
+      <% } %>
+    </nav>
+  </div>
+</header>
+
+<!-- 검색 및 필터 섹션 -->
+<section class="search-section">
+  <div class="search-container">
+    <form class="search-form" method="get" action="/search">
+      <div class="search-input-group">
+        <i class="fas fa-search search-icon"></i>
+        <input type="text" name="query" placeholder="어떤 상품을 찾고 계세요?" class="search-input">
+        <button type="submit" class="search-btn">검색</button>
+      </div>
+    </form>
+    
+    <!-- <div class="filter-options">
+      <select name="region" class="filter-select">
+        <option value="">전체 지역</option>
+        <option value="서울">서울</option>
+        <option value="경기">경기</option>
+        <option value="인천">인천</option>
+        <option value="부산">부산</option>
+        <option value="대구">대구</option>
+      </select>
+      
+      <select name="price" class="filter-select">
+        <option value="">가격대</option>
+        <option value="0-10000">1만원 이하</option>
+        <option value="10000-50000">1만원-5만원</option>
+        <option value="50000-100000">5만원-10만원</option>
+        <option value="100000-">10만원 이상</option>
+      </select>
+    </div> -->
+  </div>
+</section>
+
+<!-- 카테고리 섹션 -->
+<section class="category-section">
+  <div class="category-container">
+    <h2 class="section-title">카테고리</h2>
+    <div class="category-grid">
+      <a href="/category/electronics" class="category-item">
+        <i class="fas fa-mobile-alt"></i>
+        <span>전자기기</span>
+      </a>
+      <a href="/category/fashion" class="category-item">
+        <i class="fas fa-tshirt"></i>
+        <span>의류/패션</span>
+      </a>
+      <a href="/category/books" class="category-item">
+        <i class="fas fa-book"></i>
+        <span>도서/문구</span>
+      </a>
+      <a href="/category/home" class="category-item">
+        <i class="fas fa-home"></i>
+        <span>생활용품</span>
+      </a>
+      <a href="/category/sports" class="category-item">
+        <i class="fas fa-dumbbell"></i>
+        <span>스포츠</span>
+      </a>
+      <a href="/category/beauty" class="category-item">
+        <i class="fas fa-spa"></i>
+        <span>미용</span>
+      </a>
+      <a href="/category/food" class="category-item">
+        <i class="fas fa-utensils"></i>
+        <span>식품</span>
+      </a>
+      <a href="/category/others" class="category-item">
+        <i class="fas fa-ellipsis-h"></i>
+        <span>기타</span>
+      </a>
+    </div>
+  </div>
+</section>
+
+<!-- 최신 상품 섹션 -->
+<main class="products-section">
+  <div class="products-container">
+    <div class="section-header">
+      <h2 class="section-title">최신 상품</h2>
+      <!-- <div class="sort-options">
+        <select class="sort-select">
+          <option value="latest">최신순</option>
+          <option value="price-low">낮은 가격순</option>
+          <option value="price-high">높은 가격순</option>
+          <option value="popular">인기순</option>
+        </select>
+      </div> -->
+    </div>
+    
+    <div class="products-grid">
+      <% if (typeof posts !== 'undefined' && posts && posts.length > 0) { %>
+        <% posts.forEach(function(post) { %>
+          <div class="product-card">
+            <div class="product-image">
+              <% if (post.images && post.images.length > 0) { %>
+                <img src="<%= post.images[0] %>\" alt="<%= post.title %>">
+              <% } else { %>
+                <img src="https://via.placeholder.com/250x200/E2E8F0/718096?text=이미지없음\" alt="<%= post.title %>">
+              <% } %>
+              <div class="product-status <%= post.status === 'SOLD' ? 'sold' : '' %>"><%= post.status === 'SOLD' ? '판매완료' : '판매중' %></div>
+            </div>
+            <div class="product-info">
+              <h3 class="product-title"><%= post.title %></h3>
+              <p class="product-price"><%= post.price.toLocaleString() %>원</p>
+              <div class="product-meta">
+                <span class="location"><i class="fas fa-map-marker-alt"></i> <%= post.region || '지역정보없음' %></span>
+                <span class="time"><i class="fas fa-clock"></i> <%= new Date(post.createdAt).toLocaleDateString() %></span>
+              </div>
+            </div>
+          </div>
+        <% }); %>
+      <% } else { %>
+        <!-- 샘플 게시글들 -->
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/250x200/4A90E2/ffffff?text=헤드폰" alt="무선 헤드폰">
+            <div class="product-status">판매중</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">소니 무선 헤드폰 WH-1000XM4</h3>
+            <p class="product-price">150,000원</p>
+            <div class="product-meta">
+              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 강남구</span>
+              <span class="time"><i class="fas fa-clock"></i> 2시간 전</span>
+            </div>
+          </div>
+        </div>
+      <% } %>
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/250x200/50C878/ffffff?text=책" alt="전공서적">
+            <div class="product-status">판매중</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">컴퓨터공학 전공서적 3권 세트</h3>
+            <p class="product-price">25,000원</p>
+            <div class="product-meta">
+              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 성북구</span>
+              <span class="time"><i class="fas fa-clock"></i> 1일 전</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/250x200/FF6B6B/ffffff?text=의류" alt="후드티">
+            <div class="product-status">판매중</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">나이키 후드티 (M사이즈)</h3>
+            <p class="product-price">35,000원</p>
+            <div class="product-meta">
+              <span class="location"><i class="fas fa-map-marker-alt"></i> 경기 성남시</span>
+              <span class="time"><i class="fas fa-clock"></i> 3시간 전</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/250x200/FFD93D/ffffff?text=전자기기" alt="태블릿">
+            <div class="product-status">판매중</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">아이패드 에어 4세대 64GB</h3>
+            <p class="product-price">450,000원</p>
+            <div class="product-meta">
+              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 마포구</span>
+              <span class="time"><i class="fas fa-clock"></i> 5시간 전</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/250x200/A569BD/ffffff?text=화장품" alt="화장품">
+            <div class="product-status">판매중</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">에스티로더 파운데이션 새상품</h3>
+            <p class="product-price">28,000원</p>
+            <div class="product-meta">
+              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 종로구</span>
+              <span class="time"><i class="fas fa-clock"></i> 1일 전</span>
+            </div>
+          </div>
+        </div>
+        
+        <div class="product-card">
+          <div class="product-image">
+            <img src="https://via.placeholder.com/250x200/45B7D1/ffffff?text=가전" alt="청소기">
+            <div class="product-status">판매중</div>
+          </div>
+          <div class="product-info">
+            <h3 class="product-title">다이슨 무선청소기 V8</h3>
+            <p class="product-price">180,000원</p>
+            <div class="product-meta">
+              <span class="location"><i class="fas fa-map-marker-alt"></i> 인천 남동구</span>
+              <span class="time"><i class="fas fa-clock"></i> 6시간 전</span>
+            </div>
+          </div>
+        </div>
+    </div>
+    
+    <div class="load-more">
+      <button class="btn btn-outline">더 많은 상품 보기</button>
+    </div>
+  </div>
+</main>
+
+<!-- 푸터 -->
+<footer class="footer">
+  <div class="footer-content">
+  </div>
+</footer>
+
+</body>
+</html>

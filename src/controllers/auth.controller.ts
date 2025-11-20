@@ -41,3 +41,54 @@ export const handlerLogout = (req: Request, res: Response, next: NextFunction) :
         next(error);
     }
 }
+
+
+export const ssrhandlerLogin = async (req: Request<{},{}, LoginRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
+    const { email, password } = req.body;
+    
+    try {
+        const user = await loginUser({ email, password });
+
+        req.session.userId = user.userId as number;
+        req.session.isLoggedIn = true as boolean;
+        
+        res.redirect('/');
+
+    } catch (error : any) {
+        res.render('login', { 
+            title: 'Login Page',
+            error: error.message || '로그인 중 오류가 발생했습니다.'
+        });
+    }
+};
+
+export const ssrhandlerSignup = async (req: Request<{},{}, SignupRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
+    const userData = {
+        username: req.body.username,
+        email: req.body.email,
+        password: req.body.password,
+        phone_num: req.body.phone_num,
+        region_code: req.body.region_code,
+        address_detail: req.body.address_detail
+    };
+    
+    try {
+        await signupUser(userData as SignupRequestBody);
+        res.redirect('/auth/login');
+    } catch (error: any) {
+        res.render('register', { 
+            title: 'Register Page',
+            error: error.message || '회원가입 중 오류가 발생했습니다.'
+        });
+    }
+};
+
+export const ssrhandlerLogout = (req: Request, res: Response, next: NextFunction) : void => {
+    req.session.destroy((err) => {
+        if (err) {
+            console.error('세션 삭제 중 오류:', err);
+        }
+        res.redirect('/');
+    });
+};
+            

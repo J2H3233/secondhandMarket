@@ -14,6 +14,7 @@ export const createPostSevice = async (
     transaction_type: PostTransactionType,
     content: string,
     title: string,
+    category_name: string | undefined,
     // image_files: MulterFile[]
 ): Promise<any> => {
     try {
@@ -26,6 +27,7 @@ export const createPostSevice = async (
                 transaction_type as PostTransactionType,
                 content,
                 title,
+                category_name,
                 tx
             );
 
@@ -76,8 +78,8 @@ const createPostImages = async (
     });
 }
 
-export const getPost = async (id: number): Promise<any> => {
-    const post = await findPostById(id);
+export const getPost = async (id: number, tx?: any): Promise<any> => {
+    const post = await findPostById(id, tx);
     if (!post) {
         throw new CustomError(404, ErrorCodes.NOT_FOUND, '게시물을 찾을 수 없습니다.');
     }
