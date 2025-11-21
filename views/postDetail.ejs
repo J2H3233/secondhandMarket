@@ -1,19 +1,24 @@
+<% 
+    title = (post && post.title ? post.title + ' - ' : '') + '한성마켓';
+    additionalCSS = ['/css/postDetail.css'];
+%>
+
 <!-- 상품 상세 내용 -->
 <main class="post-detail-container">
   <div class="post-content">
     
     <!-- 이미지 섹션 -->
     <div class="image-section">
-      <% if (post.images && post.images.length > 0) { %>
+      <% if (post.post_img && post.post_img.length > 0) { %>
         <div class="main-image">
-          <img src="<%= post.images[0].image_url %>" alt="<%= post.title %>" id="mainImage">
+          <img src="/uploads/temp/<%= post.post_img[0].url %>" alt="<%= post.title %>" id="mainImage">
         </div>
-        <% if (post.images.length > 1) { %>
+        <% if (post.post_img.length > 1) { %>
           <div class="thumbnail-images">
-            <% post.images.forEach((image, index) => { %>
-              <img src="<%= image.image_url %>" alt="상품 이미지 <%= index + 1 %>" 
+            <% post.post_img.forEach((image, index) => { %>
+              <img src="/uploads/temp/<%= image.url %>" alt="상품 이미지 <%= index + 1 %>" 
                    class="thumbnail <%= index === 0 ? 'active' : '' %>"
-                   onclick="changeMainImage('<%= image.image_url %>', this)">
+                   onclick="changeMainImage('/uploads/temp/<%= image.url %>', this)">
             <% }) %>
           </div>
         <% } %>
@@ -53,7 +58,7 @@
         <div class="product-meta">
           <div class="meta-item">
             <i class="fas fa-tag"></i>
-            <span>카테고리: <%= post.category?.category_name || '123' %></span>
+            <span>카테고리: <%= post.category?.category_name || '미분류' %></span>
           </div>
           <div class="meta-item">
             <i class="fas fa-truck"></i>

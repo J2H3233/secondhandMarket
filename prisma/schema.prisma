@@ -182,6 +182,7 @@ model post_img {
   created_at DateTime @default(now()) @db.Timestamp(0)
   updated_at DateTime @default(now()) @db.Timestamp(0)
   url        String?  @db.VarChar(512)
+  order      Int      
 
   // 관계 필드
   post post @relation(fields: [post_id], references: [id], map: "FK_post_TO_post_img_1")
