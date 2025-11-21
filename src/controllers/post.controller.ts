@@ -8,7 +8,7 @@ export const handlerCreatePost = async (req: Request<{}, {}, CreatePostRequestBo
     const { region_code, price, delivery_charge, transaction_type, content, title, category_name } = req.body;
     const userId = Number(req.session.userId);
     try {
-        const newPost =  await createPostSevice(region_code, userId, price, delivery_charge, transaction_type as any, content, title, category_name);
+        const newPost =  await createPostSevice(region_code, userId, price, delivery_charge, transaction_type as any, content, title, category_name, []);
         res.jsonSuccess(newPost, '게시글 생성에 성공했습니다.', 201);
     } catch (error) {
         next(error);
@@ -40,19 +40,53 @@ export const handlerSoftDeletePost = async (req: Request<{ id: number }, {}, {}>
 
 
 export const ssrhandlerCreatePost = async (req: Request<{},{}, CreatePostRequestBody>, res: Response, next: NextFunction) : Promise<void> => {
+    
+    console.log('=== 디버깅 정보 ===');
+    console.log('req.body:', req.body);
+    console.log('req.files:', req.files);
+    console.log('Content-Type:', req.headers['content-type']);
+    console.log('req.is multipart:', req.is('multipart/form-data'));
+    
+    // body가 undefined인 경우 처리
+    if (!req.body) {
+        console.error('req.body가 undefined입니다.');
+        return res.redirect('/post/new?error=invalid_form_data');
+    }
+
     const { 
         region_code, 
         price, 
         delivery_charge, 
         transaction_type, 
-        content, title, 
+        content, 
+        title, 
         category_name 
     } = req.body;
+
+    // 필수 필드 검증
+    if (!title || !content || !price || !region_code || !transaction_type || !category_name) {
+        console.error('필수 필드가 누락되었습니다:', { title, content, price, region_code, transaction_type, category_name });
+        return res.redirect('/post/new?error=missing_required_fields');
+    }
+
+    const images = req.files as Express.Multer.File[];
     const userId = Number(req.session.userId);
+    
     try {
-        const newPost =  await createPostSevice(region_code, userId, Number(price), Number(delivery_charge), transaction_type as any, content, title, category_name);
+        const newPost = await createPostSevice(
+            region_code, 
+            userId, 
+            Number(price), 
+            Number(delivery_charge), 
+            transaction_type as any, 
+            content, 
+            title, 
+            category_name, 
+            images || []
+        );
         res.redirect(`/post/${newPost.id}`);
     } catch (error) {
+        console.error('게시글 생성 오류:', error);
         res.redirect('/post/new?error=failed_to_create');
     }
 }
@@ -75,9 +109,9 @@ export const ssrhandlerGetPost = async (req: Request<{ id: number }, {}, {}>, re
             title: post.title as string,
             post: post, 
             user: req.session.userId ? { userId: req.session.userId } : null,
-            showHeader: true,
-            showFooter: true,
+            isLoggedIn: req.session.isLoggedIn || false,
             additionalCSS: ['/css/postDetail.css']
+            // 레이아웃 사용 (기본값)
         });
     }catch(error){
         console.error('게시물 조회 오류:', error);

@@ -7,4 +7,5 @@ export interface CreatePostRequestBody {
     content: string;
     title: string;
     category_name?: string;
+    images?: Express.Multer.File[];
 }

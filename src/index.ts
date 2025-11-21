@@ -45,6 +45,7 @@ app.use(expressLayouts);
 app.set('layout', 'layout'); // layout.ejs 파일을 기본 레이아웃으로 설정
 
 // 정적 파일 제공 설정
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads')) as any);
 app.use(express.static(path.join(process.cwd(), 'public')) as any);
 
 app.use(responseHandler as any);

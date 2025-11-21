@@ -15,47 +15,34 @@ export const createPostSevice = async (
     content: string,
     title: string,
     category_name: string | undefined,
-    // image_files: MulterFile[]
+    image_files: MulterFile[]
 ): Promise<any> => {
-    try {
-        const newPost = await prisma.$transaction(async (tx) => {
-            const createdPost = await createPost(
-                region_code,
-                posting_user_id,
-                price,
-                delivery_charge,
-                transaction_type as PostTransactionType,
-                content,
-                title,
-                category_name,
-                tx
-            );
 
-            // const postId = createdPost.id;
-            // if (image_files && image_files.length > 0) {
-            //     // MulterFile 배열에서 DB에 저장할 경로 정보만 추출
-            //     // 로컬 환경에서는 `path`나 `filename`을 사용하거나, 
-            //     // 해당 파일에 접근 가능한 정적 URL을 조합하여 사용합니다.
-            //     const filePaths = image_files.map(file => {
-            //         // 서버의 정적 파일 서비스 URL을 가정 (예: http://yourserver/uploads/filename.jpg)
-            //         // 실제 DB에 저장될 값은 클라이언트가 이미지를 불러올 수 있는 URL이 되어야 합니다.
-            //         // Multer의 `filename`을 사용하거나 `path`를 사용해 DB 저장용 URL을 구성하세요.
-                    
-            //         // 여기서는 간단히 Multer가 저장한 파일 이름(filename)을 DB에 저장한다고 가정
-            //         return file.filename; 
-            //     }); 
-                
-            //     // DB에 저장: 게시물 ID와 로컬 파일 경로 배열을 사용하여 PostImage 레코드를 생성
-            //     await createPostImages(postId, filePaths, tx); 
-            // }
+    const newPost = await prisma.$transaction(async (tx) => {
+        const createdPost = await createPost(
+            region_code,
+            posting_user_id,
+            price,
+            delivery_charge,
+            transaction_type as PostTransactionType,
+            content,
+            title,
+            category_name,
+            tx
+        );
 
-            // 이미지 업로드 로직 추가 예정
-            return createdPost;
-        });
-        return newPost;
-    } catch (error) {
-        throw new CustomError(500, ErrorCodes.INTERNAL_SERVER_ERROR, '게시물 생성 중 오류 발생');
-    }
+        if (image_files && image_files.length > 0) {
+            await createPostImages(createdPost.id, image_files.map(file => file.filename), tx);
+        }
+
+        const resultPost = await findPostById(createdPost.id, tx);
+        if (!resultPost) {
+            throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '게시물 생성 후 조회시 오류가 발생했습니다.');
+        }
+        return resultPost;
+    });
+    return newPost;
+
 }
 
 const createPostImages = async (
@@ -72,7 +59,7 @@ const createPostImages = async (
         order: index + 1, 
     }));
 
-    await tx.postImage.createMany({
+    await tx.post_img.createMany({
         data: dataToCreate,
         skipDuplicates: true,
     });
