@@ -34,7 +34,7 @@ export const createRegion = async (sido: string, sigungu: string, eubmyeonli: st
 export const findRegionByCode = async (region_code: string, client: DBClient = prisma) => {
     try {
         return await client.region.findUnique({
-            where: { region_code: region_code }
+            where: { region_code: '9999999999' }
         });
     } catch (error) {
         console.error(error);

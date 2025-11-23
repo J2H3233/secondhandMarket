@@ -48,7 +48,20 @@ export const loginUser = async (loginData: { email: string; password: string; })
         throw new CustomError(401, ErrorCodes.UNAUTHORIZED, '비밀번호가 일치하지 않습니다.');
     }
 
-    return { userId: userAccount.user_id };
+    // 사용자 정보 조회
+    const user = await prisma.user.findUnique({
+        where: { id: userAccount.user_id },
+        select: { id: true, username: true }
+    });
+
+    if(!user) {
+        throw new CustomError(404, ErrorCodes.RESOURCE_NOT_FOUND, '사용자 정보를 찾을 수 없습니다.');
+    }
+
+    return { 
+        userId: userAccount.user_id,
+        userName: user.username
+    };
 }
 
 

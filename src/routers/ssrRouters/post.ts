@@ -19,7 +19,7 @@ const router : Router = Router();
 // 게시글 작성 페이지
 router.get('/new', ssrCheckLoggedIn as any, (req, res) => {
     res.render('posting', { 
-        title: '상품 등록 - 한성마켓',
+        title: '상품 등록 - 중고마켓',
         isLoggedIn: req.session.isLoggedIn || false,
         user: req.session.userId ? { userId: req.session.userId } : null,
         additionalCSS: ['/css/posting.css']

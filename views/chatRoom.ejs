@@ -1,49 +1,314 @@
 <% 
     // 레이아웃 변수 설정
-    title = '채팅방 - 한성마켓';
+    title = '채팅방 - 중고마켓';
     additionalCSS = ['/css/chatRoom.css'];
 %>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<style>
+    /* --- 추가된 CSS 스타일 (기존 스타일 유지 + 기능 추가) --- */
+    
+    /* 메시지 컨테이너를 Flexbox로 설정하여 좌우 정렬 가능하게 함 */
+    .messages-container {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        padding: 20px;
+        overflow-y: auto;
+        background: #f5f7fb; /* 배경색 살짝 변경 */
+    }
+
+    /* 공통 말풍선 스타일 */
+    .message {
+        max-width: 70%;
+        padding: 10px 15px;
+        border-radius: 15px;
+        position: relative;
+        font-size: 0.95rem;
+        word-wrap: break-word;
+        box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+    }
+
+    /* 이미지 스타일 inside message */
+    .message img {
+        max-width: 100%;
+        border-radius: 10px;
+        margin-bottom: 5px;
+        display: block;
+    }
+
+    /* 1. 내 메시지 (오른쪽, 노란색) */
+    .message.sent {
+        align-self: flex-end;
+        background-color: #FFC107; /* 중고마켓 포인트 컬러 */
+        color: #333;
+        border-bottom-right-radius: 2px;
+    }
+
+    /* 2. 상대방 메시지 (왼쪽, 회색) */
+    .message.received {
+        align-self: flex-start;
+        background-color: #ffffff;
+        border: 1px solid #eee;
+        color: #333;
+        border-top-left-radius: 2px;
+    }
+
+    /* 시스템 메시지 (중앙) */
+    .message.system {
+        align-self: center;
+        background: rgba(0,0,0,0.05);
+        color: #666;
+        font-size: 0.8rem;
+        padding: 5px 20px;
+        border-radius: 20px;
+        box-shadow: none;
+    }
+
+    /* 거래 상태 변경 승인 요청 (중앙) */
+    .message.status-request {
+        align-self: center;
+        background: #fff3cd;
+        border: 1px solid #ffc107;
+        color: #333;
+        font-size: 0.9rem;
+        padding: 15px 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-width: 80%;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .status-request-text {
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .status-request-buttons {
+        display: flex;
+        gap: 10px;
+        justify-content: center;
+    }
+
+    .status-request-btn {
+        padding: 8px 20px;
+        border: none;
+        border-radius: 5px;
+        font-size: 0.85rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .status-request-btn.accept {
+        background: #28a745;
+        color: white;
+    }
+
+    .status-request-btn.accept:hover {
+        background: #218838;
+    }
+
+    .status-request-btn.reject {
+        background: #dc3545;
+        color: white;
+    }
+
+    .status-request-btn.reject:hover {
+        background: #c82333;
+    }
+
+    .status-request-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* 발신자 이름 표시 */
+    .message-sender {
+        display: block;
+        font-size: 0.75rem;
+        font-weight: bold;
+        margin-bottom: 3px;
+        color: #555;
+    }
+
+    .message.sent .message-sender {
+        text-align: right;
+        color: #666;
+    }
+
+    .message.received .message-sender {
+        text-align: left;
+        color: #0066cc;
+    }
+
+    /* 시간 표시 */
+    .message-time {
+        display: block;
+        font-size: 0.7rem;
+        color: #777; /* 가독성을 위해 색상 조정 */
+        margin-top: 4px;
+        text-align: right;
+    }
+
+    /* 헤더 영역 수정 (제목 + 상태변경) */
+    .chat-header {
+        display: flex;
+        justify-content: space-between; /* 양끝 정렬 */
+        align-items: center;
+        padding: 15px 20px;
+        border-bottom: 1px solid #eee;
+    }
+
+    /* 거래 상태 영역 */
+    .trade-status-area {
+        display: none; /* 방 선택 전에는 숨김 */
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+
+    /* 거래 상태 드롭다운 */
+    .trade-status-select {
+        padding: 5px 10px;
+        border-radius: 20px;
+        border: 1px solid #ddd;
+        background: #fff;
+        font-size: 0.85rem;
+        font-weight: bold;
+        cursor: pointer;
+    }
+
+    /* 요청 버튼 */
+    .request-status-btn {
+        padding: 6px 16px;
+        border: none;
+        border-radius: 20px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .request-status-btn:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+    }
+
+    .request-status-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* 입력창 영역 수정 (이미지 버튼 추가) */
+    .input-container {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+    }
+    
+    .file-btn-label {
+        font-size: 1.5rem;
+        cursor: pointer;
+        color: #888;
+        transition: color 0.2s;
+    }
+    .file-btn-label:hover { color: #333; }
+    #file-input { display: none; } /* 실제 파일 인풋은 숨김 */
+
+    /* 이미지 미리보기 */
+    #image-preview {
+        display: none;
+        padding: 10px;
+        background: #f8f9fa;
+        border-top: 1px solid #eee;
+        position: relative;
+    }
+    #image-preview img {
+        max-height: 100px;
+        border-radius: 5px;
+        border: 1px solid #ddd;
+    }
+    #preview-close {
+        position: absolute;
+        left: 100px; /* 이미지 크기에 따라 조정 */
+        top: 5px;
+        background: red;
+        color: white;
+        border: none;
+        border-radius: 50%;
+        width: 20px;
+        height: 20px;
+        cursor: pointer;
+        font-size: 12px;
+        line-height: 18px;
+        text-align: center;
+    }
+</style>
+
 <div class="chat-page">
     <div class="chat-island">
         <div class="chat-container">
-            <!-- 채팅방 목록 -->
+            
             <div class="room-list">
                 <div class="room-list-header">
                     <h3>채팅방 목록</h3>
                 </div>
                 
                 <div class="room-items-container">
-                    <div class="room-item" data-room-id="1">
-                        <div class="room-name">일반 채팅방</div>
-                        <div class="room-last-message">안녕하세요!</div>
+                    <div class="room-item" data-room-id="room1">
+                        <div class="room-name">테스트 채팅방</div>
+                        <div class="room-last-message">테스트</div>
                     </div>
-                    
-                    <div class="room-item" data-room-id="2">
-                        <div class="room-name">개발팀 채팅방</div>
-                        <div class="room-last-message">프로젝트 진행상황 공유</div>
-                    </div>
-                    
-                    <div class="room-item" data-room-id="3">
-                        <div class="room-name">자유 주제</div>
-                        <div class="room-last-message">오늘 점심 뭐 먹을까요?</div>
+                    <div class="room-item" data-room-id="room2">
+                        <div class="room-name">테스트 채팅방2</div>
+                        <div class="room-last-message">테스트</div>
                     </div>
                 </div>
             </div>
 
-            <!-- 채팅 영역 -->
             <div class="chat-area">
+                
                 <div class="chat-header">
                     <h2 id="current-room-name">채팅방을 선택하세요</h2>
+                    
+                    <div class="trade-status-area" id="trade-status-area">
+                        <select id="trade-status" class="trade-status-select">
+                            <option value="PENDING">🤝 협의중</option>
+                            <option value="IN_PERSON">🚶 직거래요청</option>
+                            <option value="SHIPPING">🚚 배송요청</option>
+                            <option value="CANCELED">❌ 거래취소</option>
+                            <option value="COMPLETED">✅ 거래완료</option>
+                        </select>
+                        <button id="request-status-btn" class="request-status-btn">요청</button>
+                    </div>
                 </div>
                 
                 <div class="messages-container" id="messages-container">
                     <div class="no-room-selected" id="no-room-message">
-                        채팅방을 선택하여 대화를 시작하세요
+                        <p style="text-align: center; color: #888; margin-top: 200px;">
+                            채팅방을 선택하여 대화를 시작하세요
+                        </p>
                     </div>
                 </div>
                 
                 <div class="input-area" id="input-area" style="display: none;">
+                    
+                    <div id="image-preview">
+                        <img src="" id="preview-img" alt="preview">
+                        <div id="preview-close" onclick="clearImage()">X</div>
+                    </div>
+
                     <div class="input-container">
+                        <label for="file-input" class="file-btn-label">📷</label>
+                        <input type="file" id="file-input" accept="image/*">
+
                         <input type="text" class="message-input" id="message-input" placeholder="메시지를 입력하세요..." maxlength="1000">
                         <button class="send-btn" id="send-btn">전송</button>
                     </div>
@@ -54,23 +319,23 @@
 </div>
 
 <script>
-    let currentRoomId = null;
-    let messages = {
-        1: [
-            { type: 'received', text: '안녕하세요! 일반 채팅방에 오신 것을 환영합니다.', time: '14:30' },
-            { type: 'sent', text: '안녕하세요!', time: '14:31' }
-        ],
-        2: [
-            { type: 'received', text: '프로젝트 진행상황을 공유해주세요.', time: '13:20' },
-            { type: 'sent', text: '현재 80% 정도 완료되었습니다.', time: '13:25' }
-        ],
-        3: [
-            { type: 'received', text: '오늘 점심 뭐 먹을까요?', time: '12:00' },
-            { type: 'sent', text: '한식 어떠세요?', time: '12:05' }
-        ]
-    };
+    const socket = io();
 
-    // DOM 요소들
+    // 서버에서 전달받은 로그인 정보
+    <% if (user) { %>
+    const myUserId = <%= user.userId %>;
+    const myUserName = "<%= user.userName %>";
+    <% } else { %>
+    const myUserId = null;
+    const myUserName = "게스트";
+    <% } %>
+
+    let currentRoomId = null;
+    let selectedImageBase64 = null; // 선택된 이미지 데이터 저장
+    let pendingStatusChange = null; // 대기 중인 상태 변경 요청
+    let currentStatus = 'PENDING'; // 현재 거래 상태
+
+    // DOM 요소
     const roomItems = document.querySelectorAll('.room-item');
     const messagesContainer = document.getElementById('messages-container');
     const currentRoomName = document.getElementById('current-room-name');
@@ -78,8 +343,17 @@
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
     const noRoomMessage = document.getElementById('no-room-message');
+    
+    const fileInput = document.getElementById('file-input');
+    const imagePreview = document.getElementById('image-preview');
+    const previewImg = document.getElementById('preview-img');
+    const statusSelect = document.getElementById('trade-status');
+    const statusArea = document.getElementById('trade-status-area');
+    const requestStatusBtn = document.getElementById('request-status-btn');
 
-    // 채팅방 선택 이벤트
+    // --- 이벤트 리스너 ---
+
+    // 1. 채팅방 선택
     roomItems.forEach(item => {
         item.addEventListener('click', () => {
             const roomId = item.dataset.roomId;
@@ -87,85 +361,272 @@
         });
     });
 
-    // 메시지 전송 이벤트
+    // 2. 메시지 전송
     sendBtn.addEventListener('click', sendMessage);
     messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
+        if (e.key === 'Enter') sendMessage();
+    });
+
+    // 3. 이미지 파일 선택 시 미리보기
+    fileInput.addEventListener('change', (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                selectedImageBase64 = event.target.result;
+                previewImg.src = selectedImageBase64;
+                imagePreview.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
         }
     });
 
+    // 4. 거래 상태 변경 요청 버튼 클릭
+    requestStatusBtn.addEventListener('click', () => {
+        const newStatus = statusSelect.value;
+        
+        // 현재 상태와 동일하면 무시
+        if (newStatus === currentStatus) {
+            alert('현재 상태와 동일합니다.');
+            return;
+        }
+        
+        if (currentRoomId) {
+            // 서버로 상태 변경 요청 전송
+            socket.emit('request_status_change', {
+                room: currentRoomId,
+                user: myUserId,
+                userName: myUserName,
+                status: newStatus,
+                timestamp: new Date().toISOString()
+            });
+            
+            // 본인에게도 요청 메시지 표시
+            addMessageToDOM({
+                type: 'system',
+                text: `거래 상태를 '${getStatusText(newStatus)}'(으)로 변경 요청했습니다. 상대방의 수락을 기다리는 중...`
+            });
+            scrollToBottom();
+        }
+    });
+
+
+    // --- 소켓 수신 (Server -> Client) ---
+
+    // 메시지 받기
+    socket.on('receive_message', (data) => {
+        if (data.room === currentRoomId) {
+            // 1. 내가 보낸 메시지인지 확인 (Sent vs Received)
+            const type = (data.user === myUserId) ? 'sent' : 'received';
+            
+            addMessageToDOM({
+                type: type,
+                text: data.message,
+                image: data.image, // 이미지 경로 또는 Base64
+                time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+                sender: data.userName || data.user // 발신자 이름 추가
+            });
+            scrollToBottom();
+            
+            // 사이드바의 마지막 메시지 갱신 (이미지인 경우 '사진'으로 표시)
+            updateLastMessage(data.room, data.message || "📷 사진");
+        }
+    });
+
+    // 거래 상태 변경 요청 받기 (상대방이 요청한 경우)
+    socket.on('receive_status_change_request', (data) => {
+        if (data.room === currentRoomId && data.user !== myUserId) {
+            pendingStatusChange = data; // 요청 정보 저장
+            
+            // 수락/거부 버튼이 있는 말풍선 추가
+            addStatusRequestMessageToDOM({
+                requestId: data.timestamp,
+                userName: data.userName,
+                status: data.status,
+                statusText: getStatusText(data.status)
+            });
+            scrollToBottom();
+        }
+    });
+
+    // 거래 상태 변경 승인 결과 받기
+    socket.on('status_change_response', (data) => {
+        if (data.room === currentRoomId) {
+            if (data.accepted) {
+                // 승인된 경우 - 상태 업데이트
+                currentStatus = data.status;
+                statusSelect.value = data.status;
+                addMessageToDOM({
+                    type: 'system',
+                    text: `거래 상태가 '${getStatusText(data.status)}'(으)로 변경되었습니다.`
+                });
+            } else {
+                // 거부된 경우
+                addMessageToDOM({
+                    type: 'system',
+                    text: `상대방이 거래 상태 변경을 거부했습니다.`
+                });
+                // 드롭다운을 현재 상태로 되돌림
+                statusSelect.value = currentStatus;
+            }
+            scrollToBottom();
+        }
+    });
+
+
+    // --- 기능 함수들 ---
+
     function selectRoom(roomId, roomElement) {
-        // 이전 선택된 방 비활성화
+        if (currentRoomId === roomId) return;
+
+        // UI 활성화 처리
         roomItems.forEach(item => item.classList.remove('active'));
-        
-        // 현재 방 활성화
         roomElement.classList.add('active');
-        currentRoomId = roomId;
         
-        // 헤더 업데이트
         const roomName = roomElement.querySelector('.room-name').textContent;
         currentRoomName.textContent = roomName;
         
-        // 입력 영역 표시
         inputArea.style.display = 'block';
+        statusArea.style.display = 'flex'; // 상태 영역 보이기
         noRoomMessage.style.display = 'none';
-        
-        // 메시지 로드
-        loadMessages(roomId);
-    }
+        messagesContainer.innerHTML = ''; // 대화내용 초기화
 
-    function loadMessages(roomId) {
-        messagesContainer.innerHTML = '';
-        
-        if (messages[roomId]) {
-            messages[roomId].forEach(message => {
-                addMessageToDOM(message);
-            });
-        }
-        
-        scrollToBottom();
-    }
+        currentRoomId = roomId;
+        currentStatus = 'PENDING'; // 초기 상태 (실제로는 서버에서 받아와야 함)
+        statusSelect.value = currentStatus;
 
-    function addMessageToDOM(message) {
-        const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', message.type);
-        messageDiv.textContent = message.text;
-        messagesContainer.appendChild(messageDiv);
+        // 소켓 방 입장
+        socket.emit('join_room', roomId);
+
+        // 시스템 메시지
+        addMessageToDOM({
+            type: 'system',
+            text: `[${roomName}] 채팅방에 입장했습니다.`
+        });
     }
 
     function sendMessage() {
         const text = messageInput.value.trim();
-        
-        if (text && currentRoomId) {
-            const message = {
-                type: 'sent',
-                text: text,
-                time: new Date().toLocaleTimeString('ko-KR', { 
-                    hour: '2-digit', 
-                    minute: '2-digit' 
-                })
+
+        // 텍스트나 이미지가 하나라도 있으면 전송
+        if ((text || selectedImageBase64) && currentRoomId) {
+            const messageData = {
+                room: currentRoomId,
+                user: myUserId,
+                userName: myUserName, // 발신자 이름 추가
+                message: text,
+                image: selectedImageBase64 // 이미지 데이터 포함
             };
-            
-            // 메시지 저장
-            if (!messages[currentRoomId]) {
-                messages[currentRoomId] = [];
-            }
-            messages[currentRoomId].push(message);
-            
-            // DOM에 추가
-            addMessageToDOM(message);
-            
+
+            socket.emit('send_message', messageData);
+
             // 입력창 초기화
             messageInput.value = '';
-            
-            // 스크롤 하단으로
-            scrollToBottom();
-            
-            // 채팅방 목록의 마지막 메시지 업데이트
-            updateLastMessage(currentRoomId, text);
+            clearImage();
+            messageInput.focus();
         }
     }
+
+    function clearImage() {
+        fileInput.value = '';
+        selectedImageBase64 = null;
+        imagePreview.style.display = 'none';
+    }
+
+    function addMessageToDOM(msg) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', msg.type);
+        
+        let htmlContent = '';
+
+        // 0. 발신자 이름 (일반 메시지일 때만, 시스템 메시지 제외)
+        if (msg.sender && msg.type !== 'system') {
+            const senderName = msg.type === 'sent' ? '나' : msg.sender;
+            htmlContent += `<span class="message-sender">${senderName}</span>`;
+        }
+
+        // 1. 이미지가 있으면 추가
+        if (msg.image) {
+            htmlContent += `<img src="${msg.image}" alt="첨부 이미지" />`;
+        }
+
+        // 2. 텍스트가 있으면 추가
+        if (msg.text) {
+            htmlContent += `<span>${msg.text}</span>`;
+        }
+
+        // 3. 시간 (시스템 메시지 제외)
+        if (msg.type !== 'system') {
+            htmlContent += `<span class="message-time">${msg.time}</span>`;
+        }
+
+        messageDiv.innerHTML = htmlContent;
+        messagesContainer.appendChild(messageDiv);
+    }
+
+    function addStatusRequestMessageToDOM(request) {
+        const messageDiv = document.createElement('div');
+        messageDiv.classList.add('message', 'status-request');
+        messageDiv.dataset.requestId = request.requestId;
+        
+        const htmlContent = `
+            <div class="status-request-text">
+                💬 ${request.userName}님이 거래 상태를 '<strong>${request.statusText}</strong>'(으)로 변경하길 원합니다.
+            </div>
+            <div class="status-request-buttons">
+                <button class="status-request-btn accept" onclick="respondToStatusChange('${request.requestId}', true)">
+                    ✅ 수락
+                </button>
+                <button class="status-request-btn reject" onclick="respondToStatusChange('${request.requestId}', false)">
+                    ❌ 거부
+                </button>
+            </div>
+        `;
+        
+        messageDiv.innerHTML = htmlContent;
+        messagesContainer.appendChild(messageDiv);
+    }
+
+    function respondToStatusChange(requestId, accepted) {
+        if (!pendingStatusChange) return;
+
+        // 버튼 비활성화
+        const requestDiv = document.querySelector(`[data-request-id="${requestId}"]`);
+        if (requestDiv) {
+            const buttons = requestDiv.querySelectorAll('.status-request-btn');
+            buttons.forEach(btn => btn.disabled = true);
+        }
+
+        // 서버로 응답 전송
+        socket.emit('respond_status_change', {
+            room: currentRoomId,
+            requestId: requestId,
+            accepted: accepted,
+            status: pendingStatusChange.status,
+            user: myUserId
+        });
+
+        // 본인 화면에 결과 표시
+        if (accepted) {
+            currentStatus = pendingStatusChange.status;
+            statusSelect.value = pendingStatusChange.status;
+            addMessageToDOM({
+                type: 'system',
+                text: `거래 상태가 '${getStatusText(pendingStatusChange.status)}'(으)로 변경되었습니다.`
+            });
+        } else {
+            addMessageToDOM({
+                type: 'system',
+                text: `거래 상태 변경을 거부했습니다.`
+            });
+        }
+        
+        pendingStatusChange = null;
+        scrollToBottom();
+    }
+
+    // 전역 함수로 등록 (onclick에서 사용)
+    window.respondToStatusChange = respondToStatusChange;
 
     function updateLastMessage(roomId, text) {
         const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
@@ -177,5 +638,16 @@
 
     function scrollToBottom() {
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    function getStatusText(status) {
+        switch(status) {
+            case 'PENDING': return '협의중';
+            case 'IN_PERSON': return '직거래중';
+            case 'SHIPPING': return '배송중';
+            case 'CANCELED': return '거래취소';
+            case 'COMPLETED': return '거래완료';
+            default: return status;
+        }
     }
 </script>

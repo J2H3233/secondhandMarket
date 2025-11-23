@@ -1,5 +1,5 @@
 <% 
-    title = (post && post.title ? post.title + ' - ' : '') + '한성마켓';
+    title = (post && post.title ? post.title + ' - ' : '') + '중고마켓';
     additionalCSS = ['/css/postDetail.css'];
 %>
 
@@ -182,7 +182,7 @@ function deletePost(postId) {
 
 // 판매자 연락
 function contactSeller() {
-  alert('채팅 기능은 준비 중입니다.');
+  location.href = '/chat';
 }
 
 // 관심상품 추가/제거

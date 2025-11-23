@@ -21,6 +21,7 @@ export const handlerLogin = async (req: Request<{}, {}, LoginRequestBody>, res: 
     try {
         const user = await loginUser({ email, password });
         req.session.userId = user.userId as number;
+        req.session.userName = user.userName as string;
         req.session.isLoggedIn = true as boolean; 
 
         res.jsonSuccess(user.userId, '로그인에 성공했습니다.', 200);
@@ -50,6 +51,7 @@ export const ssrhandlerLogin = async (req: Request<{},{}, LoginRequestBody>, res
         const user = await loginUser({ email, password });
 
         req.session.userId = user.userId as number;
+        req.session.userName = user.userName as string;
         req.session.isLoggedIn = true as boolean;
         
         res.redirect('/');
