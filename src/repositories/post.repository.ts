@@ -105,11 +105,13 @@ export const findPostDetailsById = async (id: number, client: DBClient = prisma)
                 post_img: {
                     select: {
                         id: true,
-                        url: true
+                        url: true,
+                        order: true
                     },
-                    orderBy: {
-                        id: 'asc'
-                    }
+                    orderBy: [
+                        { id: "asc" },
+                        { order: "asc" }
+                    ]
                 }
             }
         });

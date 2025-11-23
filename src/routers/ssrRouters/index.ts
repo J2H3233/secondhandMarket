@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import authRouter from './auth.js';
 import postRouter from './post.js';
+import chatRouter from './chat.js';
 
 const router : Router = Router(); 
 
@@ -15,6 +16,6 @@ router.get('/', (req, res) => {
 
 router.use('/auth', authRouter);
 router.use('/post', postRouter);
-
+router.use('/chat', chatRouter);
 
 export default router;

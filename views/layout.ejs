@@ -27,7 +27,7 @@
         <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
           <a href="/post/new" class="btn btn-primary"><i class="fas fa-plus"></i> 상품등록</a>
           <a href="/myshop" class="nav-link"><i class="fas fa-user"></i> 내상점</a>
-          <a href="/messages" class="nav-link"><i class="fas fa-comments"></i> 채팅</a>
+          <a href="/chat" class="nav-link"><i class="fas fa-comments"></i> 채팅</a>
           <form action="/auth/logout" method="POST" style="display: inline;">
             <button type="submit" class="nav-link" style="border: none; background: none; padding: 0; cursor: pointer;">
               로그아웃
@@ -52,7 +52,7 @@
       <div class="container">
         <p>&copy; 2024 한성마켓. All rights reserved.</p>
       </div>
-    </div>
+    </div> 
   </footer>
   <% } %>
 

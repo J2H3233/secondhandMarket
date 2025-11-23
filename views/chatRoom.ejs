@@ -3,46 +3,52 @@
     title = '채팅방 - 한성마켓';
     additionalCSS = ['/css/chatRoom.css'];
 %>
-<div class="chat-container">
-    <!-- 채팅 영역 -->
-    <div class="chat-area">
-        <div class="chat-header">
-            <h2 id="current-room-name">채팅방을 선택하세요</h2>
-        </div>
-        
-        <div class="messages-container" id="messages-container">
-            <div class="no-room-selected" id="no-room-message">
-                채팅방을 선택하여 대화를 시작하세요
+<div class="chat-page">
+    <div class="chat-island">
+        <div class="chat-container">
+            <!-- 채팅방 목록 -->
+            <div class="room-list">
+                <div class="room-list-header">
+                    <h3>채팅방 목록</h3>
+                </div>
+                
+                <div class="room-items-container">
+                    <div class="room-item" data-room-id="1">
+                        <div class="room-name">일반 채팅방</div>
+                        <div class="room-last-message">안녕하세요!</div>
+                    </div>
+                    
+                    <div class="room-item" data-room-id="2">
+                        <div class="room-name">개발팀 채팅방</div>
+                        <div class="room-last-message">프로젝트 진행상황 공유</div>
+                    </div>
+                    
+                    <div class="room-item" data-room-id="3">
+                        <div class="room-name">자유 주제</div>
+                        <div class="room-last-message">오늘 점심 뭐 먹을까요?</div>
+                    </div>
+                </div>
             </div>
-        </div>
-        
-        <div class="input-area" id="input-area" style="display: none;">
-            <div class="input-container">
-                <input type="text" class="message-input" id="message-input" placeholder="메시지를 입력하세요..." maxlength="1000">
-                <button class="send-btn" id="send-btn">전송</button>
-            </div>
-        </div>
-    </div>
 
-    <!-- 채팅방 목록 -->
-    <div class="room-list">
-        <div class="room-list-header">
-            <h3>채팅방 목록</h3>
-        </div>
-        
-        <div class="room-item" data-room-id="1">
-            <div class="room-name">일반 채팅방</div>
-            <div class="room-last-message">안녕하세요!</div>
-        </div>
-        
-        <div class="room-item" data-room-id="2">
-            <div class="room-name">개발팀 채팅방</div>
-            <div class="room-last-message">프로젝트 진행상황 공유</div>
-        </div>
-        
-        <div class="room-item" data-room-id="3">
-            <div class="room-name">자유 주제</div>
-            <div class="room-last-message">오늘 점심 뭐 먹을까요?</div>
+            <!-- 채팅 영역 -->
+            <div class="chat-area">
+                <div class="chat-header">
+                    <h2 id="current-room-name">채팅방을 선택하세요</h2>
+                </div>
+                
+                <div class="messages-container" id="messages-container">
+                    <div class="no-room-selected" id="no-room-message">
+                        채팅방을 선택하여 대화를 시작하세요
+                    </div>
+                </div>
+                
+                <div class="input-area" id="input-area" style="display: none;">
+                    <div class="input-container">
+                        <input type="text" class="message-input" id="message-input" placeholder="메시지를 입력하세요..." maxlength="1000">
+                        <button class="send-btn" id="send-btn">전송</button>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 </div>

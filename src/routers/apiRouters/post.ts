@@ -1,6 +1,7 @@
 import { Router } from 'express';
 import { checkLoggedIn } from '../../middlewares/passport/auth.js';
 import { handlerCreatePost, handlerGetPost, handlerSoftDeletePost } from  '../../controllers/post.controller.js';
+import upload  from '../../middlewares/multer.js';
 
 const router = Router();
 

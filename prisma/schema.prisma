@@ -116,19 +116,30 @@ model category {
   created_at    DateTime @default(now()) @db.Timestamp(0)
   updated_at    DateTime @default(now()) @db.Timestamp(0)
   category_name String?  @unique @db.VarChar(20)
+  
   parent_id     Int?
+  root_id       Int?     // [추가됨] 최상위 카테고리 ID
 
-  // 관계 필드 (순방향): 부모 카테고리 참조
-  parent_category category? @relation("CategoryToCategory", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_category_TO_category_1")
+  // 1. 기존 관계 (부모-자식)
+  // 관계 이름: "CategoryToParent"
+  parent_category category? @relation("CategoryToParent", fields: [parent_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_category_TO_category_1")
+  
+  child_categories category[] @relation("CategoryToParent")
 
-  // 역참조 관계: 자식 카테고리 목록
-  child_categories category[] @relation("CategoryToCategory")
+  // 2. [추가됨] Root 관계 (루트-하위자손)
+  // 관계 이름: "CategoryToRoot" (기존 관계와 이름이 달라야 함)
+  root_category    category?  @relation("CategoryToRoot", fields: [root_id], references: [id], onDelete: NoAction, onUpdate: NoAction, map: "FK_category_root")
+  
+  // 이 카테고리를 root로 삼는 모든 하위 카테고리들 (역참조)
+  recursively_child_categories category[] @relation("CategoryToRoot")
 
-  // 역참조 관계: 이 카테고리에 속하는 게시글 목록 (직접 연결)
+  // 게시글 목록
   post post[]
 
-  // 외래키 인덱스
+  // 인덱스
   @@index([parent_id], map: "FK_category_TO_category_1")
+  @@index([root_id], map: "FK_category_root_idx") // [추가됨] root_id로 빠른 검색을 위한 인덱스
+
   @@map("category")
 }
 
