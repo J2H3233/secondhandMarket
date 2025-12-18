@@ -4,16 +4,30 @@ import postRouter from './post.js';
 import chatRouter from './chat.js';
 import myshopRouter from './myshop.js';
 import { ssrCheckLoggedIn } from '../../middlewares/passport/auth.js';
+import { getLatestPosts } from '../../services/post.service.js';
 
 const router : Router = Router(); 
 
-router.get('/', (req, res) => {
-    res.render('index', { 
-        title: '중고마켓 - 대학생 중고거래',
-        isLoggedIn: req.session.isLoggedIn || false,
-        user: req.session.userId ? { userId: req.session.userId } : null
-        // 레이아웃 사용 (기본값)
-    });
+router.get('/', async (req, res) => {
+    try {
+        // 최신 게시글 20개 조회
+        const posts = await getLatestPosts(20, 0);
+        
+        res.render('index', { 
+            title: '중고마켓 - 대학생 중고거래',
+            isLoggedIn: req.session.isLoggedIn || false,
+            user: req.session.userId ? { userId: req.session.userId } : null,
+            posts: posts
+        });
+    } catch (error) {
+        console.error('메인 페이지 게시글 조회 오류:', error);
+        res.render('index', { 
+            title: '중고마켓 - 대학생 중고거래',
+            isLoggedIn: req.session.isLoggedIn || false,
+            user: req.session.userId ? { userId: req.session.userId } : null,
+            posts: []
+        });
+    }
 });
 
 router.use('/auth', authRouter);

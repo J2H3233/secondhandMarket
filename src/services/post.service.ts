@@ -1,7 +1,7 @@
 import { prisma } from "../config/db.config.js";
 import { CustomError, ErrorCodes } from "../errors/customError.js";
 import type { SessionUserInfo } from "../types/auth.types.js";
-import { createPost, findPostById, softdeletePostById, findPostDetailsById } from "../repositories/post.repository.js";
+import { createPost, findPostById, softdeletePostById, findPostDetailsById, findLatestPosts } from "../repositories/post.repository.js";
 import type { PostTransactionType } from "@prisma/client";
 import type { MulterFile } from "../types/image.types.js";
 
@@ -93,4 +93,26 @@ export const softdeletePostByIdService = async (id: number): Promise<any> => {
         return await softdeletePostById(id, tx);
     });
     return deletedPost;
+}
+
+// 최신 게시글 목록 조회
+export const getLatestPosts = async (
+    limit: number = 20,
+    offset: number = 0
+): Promise<any[]> => {
+    const posts = await findLatestPosts(limit, offset);
+    
+    return posts.map(post => ({
+        id: post.id,
+        title: post.title,
+        price: post.price,
+        status: post.status,
+        images: post.post_img.map(img => `/uploads/temp/${img.url}`),
+        region: post.region ? 
+            `${post.region.sido || ''} ${post.region.sigungu || ''}`.trim() : 
+            '지역정보없음',
+        createdAt: post.created_at,
+        category: post.category?.category_name || '미분류',
+        username: post.posting_user?.username || '알 수 없음'
+    }));
 }

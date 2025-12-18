@@ -120,3 +120,55 @@ export const findPostDetailsById = async (id: number, client: DBClient = prisma)
         throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '게시물 상세 조회시 db 오류가 발생했습니다.');
     }
 }
+
+// 최신 게시글 목록 조회
+export const findLatestPosts = async (
+    limit: number = 20,
+    offset: number = 0,
+    client: DBClient = prisma
+) => {
+    try {
+        return await client.post.findMany({
+            where: {
+                is_deleted: false
+            },
+            include: {
+                posting_user: {
+                    select: {
+                        id: true,
+                        username: true
+                    }
+                },
+                category: {
+                    select: {
+                        id: true,
+                        category_name: true
+                    }
+                },
+                region: {
+                    select: {
+                        id: true,
+                        sido: true,
+                        sigungu: true,
+                        eubmyeonli: true
+                    }
+                },
+                post_img: {
+                    select: {
+                        id: true,
+                        url: true,
+                        order: true
+                    },
+                    orderBy: { order: 'asc' },
+                    take: 1
+                }
+            },
+            orderBy: { created_at: 'desc' },
+            take: limit,
+            skip: offset
+        });
+    } catch (error) {
+        console.error(error);
+        throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '게시물 목록 조회시 db 오류가 발생했습니다.');
+    }
+}

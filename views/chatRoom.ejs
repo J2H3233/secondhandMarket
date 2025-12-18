@@ -154,21 +154,133 @@
         text-align: right;
     }
 
-    /* 헤더 영역 수정 (제목 + 상태변경) */
+    /* 헤더 영역 수정 */
     .chat-header {
         display: flex;
-        justify-content: space-between; /* 양끝 정렬 */
+        justify-content: space-between;
         align-items: center;
         padding: 15px 20px;
         border-bottom: 1px solid #eee;
+        background: #fff;
+    }
+
+    .chat-header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+    }
+
+    .chat-header-left h2 {
+        margin: 0;
+        font-size: 1.1rem;
+        color: #333;
+    }
+
+    .chat-other-user {
+        font-size: 0.8rem;
+        color: #888;
     }
 
     /* 거래 상태 영역 */
     .trade-status-area {
-        display: none; /* 방 선택 전에는 숨김 */
         display: flex;
         align-items: center;
         gap: 10px;
+    }
+
+    /* 상태 컨트롤 바 */
+    .status-control-bar {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        border-bottom: 1px solid #dee2e6;
+        gap: 10px;
+    }
+
+    .status-buttons {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+    }
+
+    .status-btn {
+        padding: 8px 14px;
+        border: 2px solid #dee2e6;
+        border-radius: 20px;
+        background: white;
+        font-size: 0.8rem;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .status-btn:hover {
+        border-color: #667eea;
+        background: #f8f9ff;
+    }
+
+    .status-btn.active {
+        border-color: #667eea;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+
+    .status-btn.danger {
+        color: #dc3545;
+    }
+
+    .status-btn.danger:hover {
+        border-color: #dc3545;
+        background: #fff5f5;
+    }
+
+    .status-btn.danger.active {
+        background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+        color: white;
+        border-color: #dc3545;
+    }
+
+    .send-status-request-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 25px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        font-size: 0.85rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+        white-space: nowrap;
+    }
+
+    .send-status-request-btn:hover:not(:disabled) {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+
+    .send-status-request-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    /* 무한 스크롤 로딩 */
+    .load-more-trigger {
+        text-align: center;
+        padding: 15px;
+        color: #888;
+        font-size: 0.85rem;
+    }
+
+    .load-more-spinner {
+        animation: spin 1s linear infinite;
+        display: inline-block;
+    }
+
+    @keyframes spin {
+        from { transform: rotate(0deg); }
+        to { transform: rotate(360deg); }
     }
 
     /* 거래 상태 드롭다운 */
@@ -250,6 +362,289 @@
         line-height: 18px;
         text-align: center;
     }
+
+    /* 상태 뱃지 */
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 20px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        background: #e9ecef;
+        color: #333;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        transition: all 0.3s ease;
+    }
+    .status-badge.pending { background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%); color: #856404; }
+    .status-badge.in_person { background: linear-gradient(135deg, #d4edda 0%, #b8dfc2 100%); color: #155724; }
+    .status-badge.shipping { background: linear-gradient(135deg, #cce5ff 0%, #a8d4ff 100%); color: #004085; }
+    .status-badge.canceled { background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%); color: #721c24; }
+    .status-badge.completed { background: linear-gradient(135deg, #d1e7dd 0%, #badbcc 100%); color: #0f5132; }
+
+    /* 상태 변경 요청 메시지 카드 */
+    .message.status-change-request {
+        align-self: center;
+        background: #ffffff;
+        border: none;
+        padding: 0;
+        border-radius: 16px;
+        max-width: 320px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+        overflow: hidden;
+    }
+
+    .status-change-card {
+        width: 100%;
+    }
+
+    .status-change-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 16px 20px;
+        text-align: center;
+    }
+
+    .status-change-header-icon {
+        font-size: 1.5rem;
+        margin-bottom: 8px;
+    }
+
+    .status-change-header-title {
+        font-size: 0.9rem;
+        font-weight: 600;
+        opacity: 0.95;
+    }
+
+    .status-change-body {
+        padding: 20px;
+        text-align: center;
+    }
+
+    .status-change-from-to {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 15px;
+    }
+
+    .status-change-arrow {
+        color: #667eea;
+        font-size: 1.2rem;
+    }
+
+    .status-change-badge {
+        padding: 8px 16px;
+        border-radius: 25px;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .status-change-badge.old {
+        background: #f1f3f5;
+        color: #868e96;
+        text-decoration: line-through;
+    }
+
+    .status-change-badge.new {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        box-shadow: 0 2px 8px rgba(102, 126, 234, 0.4);
+    }
+
+    .status-change-requester {
+        font-size: 0.8rem;
+        color: #868e96;
+        margin-top: 5px;
+    }
+
+    .status-change-buttons {
+        display: flex;
+        border-top: 1px solid #eee;
+    }
+
+    .status-change-btn {
+        flex: 1;
+        padding: 14px;
+        border: none;
+        font-size: 0.9rem;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .status-change-btn.accept {
+        background: #4caf50;
+        color: white;
+    }
+
+    .status-change-btn.accept:hover {
+        background: #43a047;
+    }
+
+    .status-change-btn.reject {
+        background: #f5f5f5;
+        color: #666;
+    }
+
+    .status-change-btn.reject:hover {
+        background: #eee;
+    }
+
+    .status-change-btn:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .status-change-result {
+        padding: 14px;
+        text-align: center;
+        font-size: 0.9rem;
+        font-weight: 600;
+    }
+
+    .status-change-result.approved {
+        background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+        color: #155724;
+    }
+
+    .status-change-result.rejected {
+        background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+        color: #721c24;
+    }
+
+    .status-change-result.pending {
+        background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+        color: #856404;
+    }
+
+    /* 거래 요청 메시지 (개선된 UI) */
+    .message.trade-request-message {
+        align-self: center;
+        background: white;
+        border: none;
+        padding: 0;
+        border-radius: 16px;
+        max-width: 90%;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        overflow: hidden;
+    }
+
+    .trade-request-card {
+        width: 100%;
+    }
+
+    .trade-request-header {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 15px 20px;
+        font-size: 1rem;
+        text-align: center;
+    }
+
+    .trade-request-details {
+        padding: 15px 20px;
+        background: #f8f9fa;
+    }
+
+    .detail-item {
+        display: flex;
+        align-items: center;
+        padding: 10px 0;
+        border-bottom: 1px solid #eee;
+    }
+
+    .detail-item:last-child {
+        border-bottom: none;
+    }
+
+    .detail-item.highlight {
+        background: #fff8e1;
+        margin: 10px -20px -15px -20px;
+        padding: 15px 20px;
+    }
+
+    .detail-icon {
+        font-size: 1.2rem;
+        margin-right: 10px;
+    }
+
+    .detail-label {
+        color: #666;
+        font-size: 0.85rem;
+        min-width: 80px;
+    }
+
+    .detail-value {
+        flex: 1;
+        font-weight: 500;
+        text-align: right;
+    }
+
+    .detail-value.price {
+        color: #e53935;
+        font-size: 1.2rem;
+        font-weight: bold;
+    }
+
+    .trade-request-buttons {
+        display: flex;
+        border-top: 1px solid #eee;
+        gap: 0;
+    }
+
+    .trade-request-buttons .trade-request-btn {
+        flex: 1;
+        padding: 12px 20px;
+        border: none;
+        font-size: 0.95rem;
+        font-weight: bold;
+        cursor: pointer;
+        transition: all 0.2s;
+        border-radius: 0;
+        margin: 0;
+    }
+
+    .trade-request-buttons .trade-request-btn.accept {
+        background: #4caf50;
+        color: white;
+        border-bottom-left-radius: 12px;
+    }
+
+    .trade-request-buttons .trade-request-btn.reject {
+        background: #f44336;
+        color: white;
+        border-bottom-right-radius: 12px;
+    }
+
+    .trade-request-buttons .trade-request-btn:hover {
+        filter: brightness(1.1);
+    }
+
+    .request-result {
+        text-align: center;
+        padding: 12px;
+        font-size: 0.95rem;
+    }
+
+    .request-result.approved {
+        background: #d4edda;
+        color: #155724;
+    }
+
+    .request-result.rejected {
+        background: #f8d7da;
+        color: #721c24;
+    }
+
+    .request-pending {
+        text-align: center;
+        padding: 12px;
+        background: #fff3cd;
+        color: #856404;
+        font-size: 0.9rem;
+    }
 </style>
 
 <div class="chat-page">
@@ -262,35 +657,64 @@
                 </div>
                 
                 <div class="room-items-container">
-                    <div class="room-item" data-room-id="room1">
-                        <div class="room-name">테스트 채팅방</div>
-                        <div class="room-last-message">테스트</div>
-                    </div>
-                    <div class="room-item" data-room-id="room2">
-                        <div class="room-name">테스트 채팅방2</div>
-                        <div class="room-last-message">테스트</div>
-                    </div>
+                    <% if (typeof chatRooms !== 'undefined' && chatRooms && chatRooms.length > 0) { %>
+                        <% chatRooms.forEach(function(room) { %>
+                            <div class="room-item" data-room-id="<%= room.id %>" data-post-id="<%= room.postId %>" data-post-title="<%= room.postTitle || '상품명 없음' %>" data-other-user="<%= room.otherUserName %>" data-status="<%= room.status %>">
+                                <div class="room-thumbnail">
+                                    <% if (room.postImageUrl) { %>
+                                        <img src="/uploads/temp/<%= room.postImageUrl %>" alt="상품 이미지">
+                                    <% } else { %>
+                                        <img src="https://via.placeholder.com/50x50/E2E8F0/718096?text=No" alt="이미지 없음">
+                                    <% } %>
+                                </div>
+                                <div class="room-info">
+                                    <div class="room-name"><%= room.postTitle || '상품명 없음' %></div>
+                                    <div class="room-other-user"><%= room.otherUserName %></div>
+                                    <div class="room-last-message"><%= room.lastMessage || '대화를 시작해보세요' %></div>
+                                </div>
+                                <div class="room-meta">
+                                    <span class="room-status <%= room.status.toLowerCase() %>"><%= getStatusBadge(room.status) %></span>
+                                    <span class="room-time"><%= formatTimeAgo(room.lastMessageTime || room.updatedAt) %></span>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="no-rooms-message" style="text-align: center; padding: 40px; color: #888;">
+                            <i class="fas fa-comments" style="font-size: 48px; margin-bottom: 15px; display: block;"></i>
+                            <p>아직 채팅방이 없습니다.</p>
+                            <p style="font-size: 0.9em;">관심있는 상품에서 판매자에게 연락해보세요!</p>
+                        </div>
+                    <% } %>
                 </div>
             </div>
 
             <div class="chat-area">
                 
                 <div class="chat-header">
-                    <h2 id="current-room-name">채팅방을 선택하세요</h2>
+                    <div class="chat-header-left">
+                        <h2 id="current-room-name">채팅방을 선택하세요</h2>
+                        <span id="current-other-user" class="chat-other-user"></span>
+                    </div>
                     
-                    <div class="trade-status-area" id="trade-status-area">
-                        <select id="trade-status" class="trade-status-select">
-                            <option value="PENDING">🤝 협의중</option>
-                            <option value="IN_PERSON">🚶 직거래요청</option>
-                            <option value="SHIPPING">🚚 배송요청</option>
-                            <option value="CANCELED">❌ 거래취소</option>
-                            <option value="COMPLETED">✅ 거래완료</option>
-                        </select>
-                        <button id="request-status-btn" class="request-status-btn">요청</button>
+                    <div class="trade-status-area" id="trade-status-area" style="display: none;">
+                        <span id="current-status-badge" class="status-badge">🤝 협의중</span>
+                    </div>
+                </div>
+                
+                <!-- 상태 변경 버튼 영역 -->
+                <div class="status-control-bar" id="status-control-bar" style="display: none;">
+                    <div class="status-buttons">
+                        <button class="status-btn" data-status="IN_PERSON" data-needs-info="true" title="직거래 요청">🚶 직거래</button>
+                        <button class="status-btn" data-status="SHIPPING" data-needs-info="true" title="배송 요청">🚚 배송</button>
+                        <button class="status-btn" data-status="COMPLETED" title="거래완료 요청">✅ 완료</button>
+                        <button class="status-btn danger" data-status="CANCELED" title="거래취소 요청">❌ 취소</button>
                     </div>
                 </div>
                 
                 <div class="messages-container" id="messages-container">
+                    <div id="load-more-trigger" class="load-more-trigger" style="display: none;">
+                        <span class="load-more-spinner">⏳</span> 이전 메시지 불러오는 중...
+                    </div>
                     <div class="no-room-selected" id="no-room-message">
                         <p style="text-align: center; color: #888; margin-top: 200px;">
                             채팅방을 선택하여 대화를 시작하세요
@@ -319,26 +743,37 @@
 </div>
 
 <script>
+    console.log('=== 스크립트 시작 ===');
     const socket = io();
+    console.log('소켓 연결됨');
 
     // 서버에서 전달받은 로그인 정보
     <% if (user) { %>
     const myUserId = <%= user.userId %>;
     const myUserName = "<%= user.userName %>";
+    console.log('로그인 유저:', myUserId, myUserName);
     <% } else { %>
     const myUserId = null;
     const myUserName = "게스트";
+    console.log('게스트 유저');
     <% } %>
 
     let currentRoomId = null;
-    let selectedImageBase64 = null; // 선택된 이미지 데이터 저장
-    let pendingStatusChange = null; // 대기 중인 상태 변경 요청
-    let currentStatus = 'PENDING'; // 현재 거래 상태
+    let currentPostId = null;
+    let currentPostTitle = null;
+    let selectedImageBase64 = null;
+    let currentStatus = 'PENDING';
+    
+    // 무한 스크롤 관련
+    let isLoadingMessages = false;
+    let hasMoreMessages = true;
+    let oldestMessageId = null;
 
     // DOM 요소
     const roomItems = document.querySelectorAll('.room-item');
     const messagesContainer = document.getElementById('messages-container');
     const currentRoomName = document.getElementById('current-room-name');
+    const currentOtherUser = document.getElementById('current-other-user');
     const inputArea = document.getElementById('input-area');
     const messageInput = document.getElementById('message-input');
     const sendBtn = document.getElementById('send-btn');
@@ -347,17 +782,60 @@
     const fileInput = document.getElementById('file-input');
     const imagePreview = document.getElementById('image-preview');
     const previewImg = document.getElementById('preview-img');
-    const statusSelect = document.getElementById('trade-status');
     const statusArea = document.getElementById('trade-status-area');
-    const requestStatusBtn = document.getElementById('request-status-btn');
+    const statusControlBar = document.getElementById('status-control-bar');
+    const statusButtons = document.querySelectorAll('.status-btn');
+    const currentStatusBadge = document.getElementById('current-status-badge');
+    const loadMoreTrigger = document.getElementById('load-more-trigger');
+
+    // 헬퍼 함수들
+    function getStatusText(status) {
+        const statusMap = {
+            'PENDING': '협의중',
+            'IN_PERSON': '직거래',
+            'SHIPPING': '배송',
+            'CANCELED': '거래취소',
+            'COMPLETED': '거래완료'
+        };
+        return statusMap[status] || status;
+    }
+
+    function getStatusEmoji(status) {
+        const emojiMap = {
+            'PENDING': '🤝',
+            'IN_PERSON': '🚶',
+            'SHIPPING': '🚚',
+            'CANCELED': '❌',
+            'COMPLETED': '✅'
+        };
+        return emojiMap[status] || '🔄';
+    }
+
+    function getStatusBadge(status) {
+        return `${getStatusEmoji(status)} ${getStatusText(status)}`;
+    }
+
+    function updateStatusBadge(status) {
+        if (currentStatusBadge) {
+            currentStatusBadge.textContent = getStatusBadge(status);
+            currentStatusBadge.className = 'status-badge ' + status.toLowerCase();
+        }
+    }
 
     // --- 이벤트 리스너 ---
 
     // 1. 채팅방 선택
-    roomItems.forEach(item => {
+    console.log('roomItems 개수:', roomItems.length);
+    roomItems.forEach((item, index) => {
+        console.log(`roomItem[${index}] 등록:`, item.dataset.roomId);
         item.addEventListener('click', () => {
+            console.log('채팅방 클릭됨:', item.dataset.roomId);
             const roomId = item.dataset.roomId;
-            selectRoom(roomId, item);
+            const postId = item.dataset.postId;
+            const postTitle = item.dataset.postTitle;
+            const otherUser = item.dataset.otherUser;
+            const status = item.dataset.status;
+            selectRoom(roomId, postId, postTitle, otherUser, status, item);
         });
     });
 
@@ -381,32 +859,26 @@
         }
     });
 
-    // 4. 거래 상태 변경 요청 버튼 클릭
-    requestStatusBtn.addEventListener('click', () => {
-        const newStatus = statusSelect.value;
-        
-        // 현재 상태와 동일하면 무시
-        if (newStatus === currentStatus) {
-            alert('현재 상태와 동일합니다.');
-            return;
-        }
-        
-        if (currentRoomId) {
-            // 서버로 상태 변경 요청 전송
-            socket.emit('request_status_change', {
-                room: currentRoomId,
-                user: myUserId,
-                userName: myUserName,
-                status: newStatus,
-                timestamp: new Date().toISOString()
-            });
+    // 4. 상태 버튼 클릭
+    statusButtons.forEach(btn => {
+        btn.addEventListener('click', () => {
+            const status = btn.dataset.status;
+            const needsInfo = btn.dataset.needsInfo === 'true';
             
-            // 본인에게도 요청 메시지 표시
-            addMessageToDOM({
-                type: 'system',
-                text: `거래 상태를 '${getStatusText(newStatus)}'(으)로 변경 요청했습니다. 상대방의 수락을 기다리는 중...`
-            });
-            scrollToBottom();
+            // 직거래 또는 택배 요청인 경우 모달 열기
+            if (needsInfo) {
+                openTradeModal(status);
+            } else {
+                // 완료/취소 요청은 바로 상태 변경 요청 전송
+                sendStatusChangeRequest(status);
+            }
+        });
+    });
+
+    // 5. 무한 스크롤 (위로 스크롤 시 이전 메시지 로드)
+    messagesContainer.addEventListener('scroll', () => {
+        if (messagesContainer.scrollTop < 100 && !isLoadingMessages && hasMoreMessages && currentRoomId) {
+            loadMoreMessages();
         }
     });
 
@@ -415,59 +887,75 @@
 
     // 메시지 받기
     socket.on('receive_message', (data) => {
-        if (data.room === currentRoomId) {
-            // 1. 내가 보낸 메시지인지 확인 (Sent vs Received)
-            const type = (data.user === myUserId) ? 'sent' : 'received';
+        if (data.room == currentRoomId) {
+            const type = (data.user == myUserId) ? 'sent' : 'received';
             
             addMessageToDOM({
+                id: data.messageId,
                 type: type,
                 text: data.message,
-                image: data.image, // 이미지 경로 또는 Base64
+                image: data.image,
                 time: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
-                sender: data.userName || data.user // 발신자 이름 추가
+                sender: data.userName || data.user
             });
             scrollToBottom();
             
-            // 사이드바의 마지막 메시지 갱신 (이미지인 경우 '사진'으로 표시)
             updateLastMessage(data.room, data.message || "📷 사진");
         }
     });
 
-    // 거래 상태 변경 요청 받기 (상대방이 요청한 경우)
-    socket.on('receive_status_change_request', (data) => {
-        if (data.room === currentRoomId && data.user !== myUserId) {
-            pendingStatusChange = data; // 요청 정보 저장
-            
-            // 수락/거부 버튼이 있는 말풍선 추가
-            addStatusRequestMessageToDOM({
-                requestId: data.timestamp,
+    // 상태 변경 요청 받기 (통합)
+    socket.on('receive_status_request', (data) => {
+        console.log('상태 변경 요청 수신:', data);
+        if (data.room == currentRoomId && data.user != myUserId) {
+            addStatusRequestToDOM({
+                requestId: data.messageId,
                 userName: data.userName,
-                status: data.status,
-                statusText: getStatusText(data.status)
+                requestedStatus: data.requestedStatus,
+                currentStatus: data.currentStatus,
+                regionName: data.regionName,
+                addressDetail: data.addressDetail,
+                amount: data.amount,
+                isMine: false
             });
             scrollToBottom();
         }
     });
 
-    // 거래 상태 변경 승인 결과 받기
-    socket.on('status_change_response', (data) => {
-        if (data.room === currentRoomId) {
-            if (data.accepted) {
-                // 승인된 경우 - 상태 업데이트
-                currentStatus = data.status;
-                statusSelect.value = data.status;
+    // 상태 변경 응답 받기 (통합)
+    socket.on('status_request_response', (data) => {
+        console.log('상태 변경 응답 수신:', data);
+        if (data.room == currentRoomId) {
+            const requestDiv = document.querySelector(`[data-request-id="${data.messageId}"]`);
+            
+            if (data.approved) {
+                currentStatus = data.newStatus;
+                updateStatusBadge(data.newStatus);
+                updateRoomStatusBadge(data.room, data.newStatus);
+                
+                if (requestDiv) {
+                    const buttonsArea = requestDiv.querySelector('.trade-request-buttons');
+                    if (buttonsArea) {
+                        buttonsArea.outerHTML = '<div class="request-result approved"><strong>✅ 승인됨</strong></div>';
+                    }
+                }
+                
                 addMessageToDOM({
                     type: 'system',
-                    text: `거래 상태가 '${getStatusText(data.status)}'(으)로 변경되었습니다.`
+                    text: `거래 상태가 '${getStatusText(data.newStatus)}'(으)로 변경되었습니다.`
                 });
             } else {
-                // 거부된 경우
+                if (requestDiv) {
+                    const buttonsArea = requestDiv.querySelector('.trade-request-buttons');
+                    if (buttonsArea) {
+                        buttonsArea.outerHTML = '<div class="request-result rejected"><strong>❌ 거부됨</strong></div>';
+                    }
+                }
+                
                 addMessageToDOM({
                     type: 'system',
-                    text: `상대방이 거래 상태 변경을 거부했습니다.`
+                    text: '상태 변경 요청이 거절되었습니다.'
                 });
-                // 드롭다운을 현재 상태로 되돌림
-                statusSelect.value = currentStatus;
             }
             scrollToBottom();
         }
@@ -476,51 +964,192 @@
 
     // --- 기능 함수들 ---
 
-    function selectRoom(roomId, roomElement) {
-        if (currentRoomId === roomId) return;
+    async function selectRoom(roomId, postId, postTitle, otherUser, status, roomElement) {
+        console.log('selectRoom 호출됨:', { roomId, postId, postTitle, otherUser, status });
+        
+        if (currentRoomId == roomId) {
+            console.log('같은 방이므로 무시');
+            return;
+        }
 
         // UI 활성화 처리
         roomItems.forEach(item => item.classList.remove('active'));
         roomElement.classList.add('active');
         
-        const roomName = roomElement.querySelector('.room-name').textContent;
-        currentRoomName.textContent = roomName;
+        // 채팅방 제목을 게시글명으로 설정
+        currentRoomName.textContent = postTitle || '상품명 없음';
+        currentOtherUser.textContent = otherUser + '님과의 대화';
         
         inputArea.style.display = 'block';
-        statusArea.style.display = 'flex'; // 상태 영역 보이기
+        statusArea.style.display = 'flex';
+        statusControlBar.style.display = 'flex';
         noRoomMessage.style.display = 'none';
-        messagesContainer.innerHTML = ''; // 대화내용 초기화
+        
+        // 메시지 컨테이너 초기화 (로딩 트리거와 no-room-message만 남기고 모두 제거)
+        const childrenToRemove = Array.from(messagesContainer.children).filter(child => {
+            return child.id !== 'load-more-trigger' && child.id !== 'no-room-message';
+        });
+        childrenToRemove.forEach(child => child.remove());
+        loadMoreTrigger.style.display = 'none';
 
         currentRoomId = roomId;
-        currentStatus = 'PENDING'; // 초기 상태 (실제로는 서버에서 받아와야 함)
-        statusSelect.value = currentStatus;
+        currentPostId = postId;
+        currentPostTitle = postTitle;
+        currentStatus = status;
+        hasMoreMessages = true;
+        oldestMessageId = null;
+        
+        updateStatusBadge(status);
 
         // 소켓 방 입장
+        console.log('소켓 방 입장:', roomId);
         socket.emit('join_room', roomId);
 
-        // 시스템 메시지
-        addMessageToDOM({
-            type: 'system',
-            text: `[${roomName}] 채팅방에 입장했습니다.`
-        });
+        // 기존 메시지 로드
+        console.log('loadMessages 호출 전');
+        await loadMessages(roomId);
+        console.log('loadMessages 완료');
+    }
+
+    // 메시지 로드 (초기 로드 및 무한 스크롤)
+    async function loadMessages(roomId, beforeId = null) {
+        if (isLoadingMessages) return;
+        isLoadingMessages = true;
+        
+        console.log('메시지 로드 시작:', { roomId, beforeId });
+        
+        if (beforeId) {
+            loadMoreTrigger.style.display = 'block';
+        }
+
+        try {
+            let url = `/api/chat/${roomId}/messages?limit=30`;
+            if (beforeId) {
+                url += `&beforeId=${beforeId}`;
+            }
+            
+            console.log('API 호출:', url);
+            
+            const response = await fetch(url);
+            const result = await response.json();
+            
+            console.log('API 응답:', result);
+            console.log('응답 상세:', { 
+                code: result.code, 
+                hasResult: !!result.result,
+                messages: result.result?.messages,
+                messagesCount: result.result?.messages?.length,
+                hasMore: result.result?.hasMore
+            });
+            
+            if (result.code === 200 && result.result) {
+                const { messages, hasMore } = result.result;
+                hasMoreMessages = hasMore;
+                
+                if (messages.length > 0) {
+                    // 가장 오래된 메시지 ID 저장
+                    oldestMessageId = messages[0].id;
+                    
+                    // 스크롤 위치 저장 (무한 스크롤 시)
+                    const scrollHeightBefore = messagesContainer.scrollHeight;
+                    
+                    // 메시지를 DOM에 추가
+                    messages.forEach((msg, index) => {
+                        const type = (msg.senderId == myUserId) ? 'sent' : 'received';
+                        
+                        // 상태 변경 요청 메시지인 경우 (JSON 형식)
+                        const statusRequestTypes = ['PENDING', 'IN_PERSON', 'SHIPPING', 'CANCELED', 'COMPLETED'];
+                        if (statusRequestTypes.includes(msg.messageType)) {
+                            try {
+                                const requestData = JSON.parse(msg.content);
+                                // STATUS_REQUEST 또는 TRADE_REQUEST 타입인 경우
+                                if (requestData.type === 'STATUS_REQUEST' || requestData.type === 'TRADE_REQUEST') {
+                                    addStatusRequestToDOM({
+                                        requestId: msg.id,
+                                        userName: msg.senderName,
+                                        requestedStatus: requestData.requestedStatus || requestData.transactionType,
+                                        currentStatus: requestData.currentStatus,
+                                        regionName: requestData.regionName,
+                                        addressDetail: requestData.addressDetail,
+                                        amount: requestData.amount,
+                                        status: requestData.status,
+                                        isMine: msg.senderId == myUserId
+                                    }, beforeId ? true : false);
+                                    return;
+                                }
+                            } catch (e) {
+                                // JSON 파싱 실패 시 일반 메시지로 처리
+                            }
+                        }
+                        
+                        // 시스템 메시지 (상태 변경 알림 등)
+                        if (msg.content && (
+                            msg.content.includes('변경되었습니다') || 
+                            msg.content.includes('승인되었습니다') || 
+                            msg.content.includes('거부되었습니다') ||
+                            msg.content.includes('취소되었습니다'))) {
+                            addMessageToDOM({
+                                id: msg.id,
+                                type: 'system',
+                                text: msg.content,
+                                time: new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' })
+                            }, beforeId ? true : false);
+                            return;
+                        }
+                        
+                        // 일반 메시지
+                        addMessageToDOM({
+                            id: msg.id,
+                            type: type,
+                            text: msg.content,
+                            image: msg.imageUrl,
+                            time: new Date(msg.createdAt).toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit' }),
+                            sender: msg.senderName
+                        }, beforeId ? true : false);
+                    });
+                    
+                    if (beforeId) {
+                        // 무한 스크롤: 스크롤 위치 유지
+                        const scrollHeightAfter = messagesContainer.scrollHeight;
+                        messagesContainer.scrollTop = scrollHeightAfter - scrollHeightBefore;
+                    } else {
+                        // 초기 로드: 맨 아래로 스크롤
+                        scrollToBottom();
+                    }
+                }
+                
+                // 더 이상 메시지가 없으면 로딩 트리거 숨김
+                loadMoreTrigger.style.display = hasMore ? 'none' : 'none';
+            }
+        } catch (error) {
+            console.error('메시지 로드 오류:', error);
+        } finally {
+            isLoadingMessages = false;
+            loadMoreTrigger.style.display = 'none';
+        }
+    }
+
+    // 이전 메시지 더 불러오기
+    async function loadMoreMessages() {
+        if (!currentRoomId || !oldestMessageId || !hasMoreMessages) return;
+        await loadMessages(currentRoomId, oldestMessageId);
     }
 
     function sendMessage() {
         const text = messageInput.value.trim();
 
-        // 텍스트나 이미지가 하나라도 있으면 전송
         if ((text || selectedImageBase64) && currentRoomId) {
             const messageData = {
                 room: currentRoomId,
                 user: myUserId,
-                userName: myUserName, // 발신자 이름 추가
+                userName: myUserName,
                 message: text,
-                image: selectedImageBase64 // 이미지 데이터 포함
+                image: selectedImageBase64
             };
 
+            // 소켓으로 전송 (서버에서 DB에 저장함)
             socket.emit('send_message', messageData);
 
-            // 입력창 초기화
             messageInput.value = '';
             clearImage();
             messageInput.focus();
@@ -533,106 +1162,383 @@
         imagePreview.style.display = 'none';
     }
 
-    function addMessageToDOM(msg) {
+    function addMessageToDOM(msg, prepend = false) {
+        console.log('addMessageToDOM 호출:', msg);
+        
+        // 시스템 메시지인 경우 float clear
+        if (msg.type === 'system') {
+            const clearDiv = document.createElement('div');
+            clearDiv.style.cssText = 'clear: both; height: 0; overflow: hidden;';
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.classList.add('message', 'system');
+            messageDiv.style.cssText = 'display: block !important; text-align: center !important; margin: 15px auto !important; max-width: 80% !important; width: auto !important; float: none !important; clear: both !important; background: #f0f0f0 !important; border: none !important; box-shadow: none !important; padding: 10px 20px !important; border-radius: 20px !important; font-size: 13px; color: #666;';
+            if (msg.id) {
+                messageDiv.dataset.messageId = msg.id;
+            }
+            messageDiv.innerHTML = `<span>${msg.text}</span>`;
+            
+            if (prepend) {
+                const firstMessage = messagesContainer.querySelector('.message');
+                if (firstMessage) {
+                    messagesContainer.insertBefore(clearDiv, firstMessage);
+                    messagesContainer.insertBefore(messageDiv, firstMessage);
+                } else {
+                    messagesContainer.appendChild(clearDiv);
+                    messagesContainer.appendChild(messageDiv);
+                }
+            } else {
+                messagesContainer.appendChild(clearDiv);
+                messagesContainer.appendChild(messageDiv);
+            }
+            return;
+        }
+        
+        // 일반 메시지 처리
         const messageDiv = document.createElement('div');
         messageDiv.classList.add('message', msg.type);
+        if (msg.id) {
+            messageDiv.dataset.messageId = msg.id;
+        }
         
         let htmlContent = '';
 
-        // 0. 발신자 이름 (일반 메시지일 때만, 시스템 메시지 제외)
         if (msg.sender && msg.type !== 'system') {
             const senderName = msg.type === 'sent' ? '나' : msg.sender;
             htmlContent += `<span class="message-sender">${senderName}</span>`;
         }
 
-        // 1. 이미지가 있으면 추가
         if (msg.image) {
             htmlContent += `<img src="${msg.image}" alt="첨부 이미지" />`;
         }
 
-        // 2. 텍스트가 있으면 추가
         if (msg.text) {
             htmlContent += `<span>${msg.text}</span>`;
         }
 
-        // 3. 시간 (시스템 메시지 제외)
         if (msg.type !== 'system') {
-            htmlContent += `<span class="message-time">${msg.time}</span>`;
+            htmlContent += `<span class="message-time">${msg.time || ''}</span>`;
         }
 
         messageDiv.innerHTML = htmlContent;
-        messagesContainer.appendChild(messageDiv);
+        
+        if (prepend) {
+            // 맨 앞에 삽입 (loadMoreTrigger 바로 다음)
+            const firstMessage = messagesContainer.querySelector('.message');
+            if (firstMessage) {
+                messagesContainer.insertBefore(messageDiv, firstMessage);
+            } else {
+                messagesContainer.appendChild(messageDiv);
+            }
+        } else {
+            messagesContainer.appendChild(messageDiv);
+        }
     }
 
-    function addStatusRequestMessageToDOM(request) {
+    // 통합된 상태 변경 요청 DOM 함수
+    function addStatusRequestToDOM(request, prepend = false) {
+        console.log('addStatusRequestToDOM 호출:', request);
+        
+        // float clear를 위한 빈 div 추가
+        const clearDiv = document.createElement('div');
+        clearDiv.style.cssText = 'clear: both; height: 0; overflow: hidden;';
+        
         const messageDiv = document.createElement('div');
-        messageDiv.classList.add('message', 'status-request');
+        messageDiv.style.cssText = 'display: block; text-align: center; margin: 20px auto; max-width: 100%; width: 100%; float: none; clear: both; background: transparent; border: none; box-shadow: none; padding: 0; border-radius: 0;';
+        messageDiv.classList.add('status-request-message');
         messageDiv.dataset.requestId = request.requestId;
         
+        const requestedStatus = request.requestedStatus;
+        const isApproved = request.status === 'APPROVED';
+        const isRejected = request.status === 'REJECTED';
+        const isPending = request.status === 'PENDING' || !request.status;
+        
+        // 요청 타입에 따른 아이콘 및 텍스트
+        const typeInfo = {
+            'IN_PERSON': { icon: '🚶', text: '직거래 요청', color: '#28a745' },
+            'SHIPPING': { icon: '🚚', text: '배송 요청', color: '#007bff' },
+            'COMPLETED': { icon: '✅', text: '거래완료 요청', color: '#17a2b8' },
+            'CANCELED': { icon: '❌', text: '거래취소 요청', color: '#dc3545' },
+            'PENDING': { icon: '🤝', text: '협의중 요청', color: '#ffc107' }
+        };
+        
+        const info = typeInfo[requestedStatus] || { icon: '🔄', text: '상태 변경 요청', color: '#6c757d' };
+        
+        // 상태 결과 HTML
+        let statusHtml = '';
+        if (isApproved) {
+            statusHtml = '<div class="request-result approved"><strong>✅ 승인됨</strong></div>';
+        } else if (isRejected) {
+            statusHtml = '<div class="request-result rejected"><strong>❌ 거부됨</strong></div>';
+        }
+        
+        // 버튼 HTML
+        let buttonsHtml = '';
+        if (isPending && !request.isMine) {
+            buttonsHtml = `
+                <div class="trade-request-buttons">
+                    <button class="trade-request-btn accept" onclick="respondToStatusRequest(${request.requestId}, true)">✅ 수락</button><button class="trade-request-btn reject" onclick="respondToStatusRequest(${request.requestId}, false)">❌ 거부</button>
+                </div>
+            `;
+        } else if (isPending && request.isMine) {
+            statusHtml = '<div class="request-pending"><span>⏳ 승인 대기중</span></div>';
+        }
+        
+        // 상세 정보 HTML (직거래/배송인 경우)
+        let detailsHtml = '';
+        if ((requestedStatus === 'IN_PERSON' || requestedStatus === 'SHIPPING') && request.amount !== undefined) {
+            detailsHtml = `
+                <div class="trade-request-details">
+                    <div class="detail-item">
+                        <span class="detail-icon">📍</span>
+                        <span class="detail-label">거래 지역</span>
+                        <span class="detail-value">${request.regionName || '-'}</span>
+                    </div>
+                    <div class="detail-item">
+                        <span class="detail-icon">🏠</span>
+                        <span class="detail-label">상세 주소</span>
+                        <span class="detail-value">${request.addressDetail || '-'}</span>
+                    </div>
+                    <div class="detail-item highlight">
+                        <span class="detail-icon">💰</span>
+                        <span class="detail-label">협의 금액</span>
+                        <span class="detail-value price">${Number(request.amount).toLocaleString()}원</span>
+                    </div>
+                </div>
+            `;
+        }
+        
         const htmlContent = `
-            <div class="status-request-text">
-                💬 ${request.userName}님이 거래 상태를 '<strong>${request.statusText}</strong>'(으)로 변경하길 원합니다.
-            </div>
-            <div class="status-request-buttons">
-                <button class="status-request-btn accept" onclick="respondToStatusChange('${request.requestId}', true)">
-                    ✅ 수락
-                </button>
-                <button class="status-request-btn reject" onclick="respondToStatusChange('${request.requestId}', false)">
-                    ❌ 거부
-                </button>
+            <div class="trade-request-card">
+                <div class="trade-request-header" style="background: linear-gradient(135deg, ${info.color} 0%, ${info.color}cc 100%);">
+                    ${info.icon} <strong>${request.userName}</strong>님의 ${info.text}
+                </div>
+                ${detailsHtml}
+                ${statusHtml}
+                ${buttonsHtml}
             </div>
         `;
         
         messageDiv.innerHTML = htmlContent;
-        messagesContainer.appendChild(messageDiv);
-    }
-
-    function respondToStatusChange(requestId, accepted) {
-        if (!pendingStatusChange) return;
-
-        // 버튼 비활성화
-        const requestDiv = document.querySelector(`[data-request-id="${requestId}"]`);
-        if (requestDiv) {
-            const buttons = requestDiv.querySelectorAll('.status-request-btn');
-            buttons.forEach(btn => btn.disabled = true);
-        }
-
-        // 서버로 응답 전송
-        socket.emit('respond_status_change', {
-            room: currentRoomId,
-            requestId: requestId,
-            accepted: accepted,
-            status: pendingStatusChange.status,
-            user: myUserId
-        });
-
-        // 본인 화면에 결과 표시
-        if (accepted) {
-            currentStatus = pendingStatusChange.status;
-            statusSelect.value = pendingStatusChange.status;
-            addMessageToDOM({
-                type: 'system',
-                text: `거래 상태가 '${getStatusText(pendingStatusChange.status)}'(으)로 변경되었습니다.`
-            });
-        } else {
-            addMessageToDOM({
-                type: 'system',
-                text: `거래 상태 변경을 거부했습니다.`
-            });
-        }
         
-        pendingStatusChange = null;
-        scrollToBottom();
+        if (prepend) {
+            messagesContainer.insertBefore(clearDiv, messagesContainer.firstChild);
+            messagesContainer.insertBefore(messageDiv, clearDiv.nextSibling);
+        } else {
+            messagesContainer.appendChild(clearDiv);
+            messagesContainer.appendChild(messageDiv);
+        }
     }
 
-    // 전역 함수로 등록 (onclick에서 사용)
-    window.respondToStatusChange = respondToStatusChange;
+    // 상태 변경 요청 함수 (API 호출)
+    async function sendStatusChangeRequest(requestedStatus, additionalInfo = null) {
+        if (!currentRoomId) return;
+        
+        console.log('상태 변경 요청 전송:', { requestedStatus, additionalInfo });
+        
+        try {
+            const body = { requestedStatus };
+            if (additionalInfo) {
+                body.regionCode = additionalInfo.regionCode;
+                body.addressDetail = additionalInfo.addressDetail;
+                body.amount = additionalInfo.amount;
+            }
+            
+            const response = await fetch(`/api/chat/${currentRoomId}/status-request`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            
+            const result = await response.json();
+            console.log('상태 변경 요청 응답:', result);
+            
+            if (result.code === 200 || result.code === 201) {
+                // 소켓으로 상대방에게 알림
+                socket.emit('send_status_request', {
+                    room: currentRoomId,
+                    user: myUserId,
+                    userName: myUserName,
+                    messageId: result.result.message.id,
+                    requestedStatus: requestedStatus,
+                    currentStatus: currentStatus,
+                    regionName: result.result.requestData?.regionName,
+                    addressDetail: result.result.requestData?.addressDetail,
+                    amount: result.result.requestData?.amount
+                });
+                
+                // 내 화면에도 표시
+                addStatusRequestToDOM({
+                    requestId: result.result.message.id,
+                    userName: myUserName,
+                    requestedStatus: requestedStatus,
+                    currentStatus: currentStatus,
+                    regionName: result.result.requestData?.regionName,
+                    addressDetail: result.result.requestData?.addressDetail,
+                    amount: result.result.requestData?.amount,
+                    isMine: true
+                });
+                
+                scrollToBottom();
+            } else {
+                alert(result.message || '요청 전송에 실패했습니다.');
+            }
+        } catch (error) {
+            console.error('상태 변경 요청 오류:', error);
+            alert('요청 전송 중 오류가 발생했습니다.');
+        }
+    }
+
+    // 상태 변경 요청 응답 함수
+    async function respondToStatusRequest(messageId, approved) {
+        const endpoint = approved ? 'approve' : 'reject';
+        
+        console.log('상태 변경 응답 시작:', { messageId, approved, endpoint, currentRoomId });
+        
+        try {
+            const response = await fetch(`/api/chat/${currentRoomId}/${endpoint}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ messageId: messageId })
+            });
+            
+            console.log('응답 상태:', response.status, response.statusText);
+            
+            const result = await response.json();
+            console.log('응답 결과:', result);
+            
+            if (result.code === 200) {
+                // 소켓으로 상대방에게 알림
+                socket.emit('status_request_response', {
+                    room: currentRoomId,
+                    messageId: messageId,
+                    approved: approved,
+                    newStatus: result.result?.newStatus
+                });
+                
+                // 버튼 비활성화 및 상태 표시
+                const requestDiv = document.querySelector(`[data-request-id="${messageId}"]`);
+                if (requestDiv) {
+                    const buttonsArea = requestDiv.querySelector('.trade-request-buttons');
+                    
+                    if (approved) {
+                        currentStatus = result.result?.newStatus || currentStatus;
+                        updateStatusBadge(currentStatus);
+                        updateRoomStatusBadge(currentRoomId, currentStatus);
+                        if (buttonsArea) {
+                            buttonsArea.outerHTML = '<div class="request-result approved"><strong>✅ 승인됨</strong></div>';
+                        }
+                        addMessageToDOM({
+                            type: 'system',
+                            text: `거래 상태가 '${getStatusText(currentStatus)}'(으)로 변경되었습니다.`
+                        });
+                    } else {
+                        if (buttonsArea) {
+                            buttonsArea.outerHTML = '<div class="request-result rejected"><strong>❌ 거부됨</strong></div>';
+                        }
+                        addMessageToDOM({
+                            type: 'system',
+                            text: '상태 변경 요청을 거부했습니다.'
+                        });
+                    }
+                }
+                scrollToBottom();
+            } else {
+                alert(result.message || '처리 중 오류가 발생했습니다.');
+            }
+        } catch (error) {
+            console.error('상태 변경 응답 오류:', error);
+            alert('처리 중 오류가 발생했습니다.');
+        }
+    }
+    window.respondToStatusRequest = respondToStatusRequest;
+
+    function openTradeModal(transactionType) {
+        // 모달이 이미 있으면 제거
+        const existingModal = document.getElementById('trade-modal');
+        if (existingModal) existingModal.remove();
+        
+        const titleText = transactionType === 'IN_PERSON' ? '🚶 직거래 요청' : '🚚 배송 요청';
+        const locationLabel = transactionType === 'IN_PERSON' ? '직거래 장소' : '배송지';
+        
+        const modalHtml = `
+            <div id="trade-modal" class="modal" style="display: flex;">
+                <div class="modal-content">
+                    <span class="modal-close" onclick="closeTradeModal()">&times;</span>
+                    <h2>${titleText}</h2>
+                    <form onsubmit="submitTradeRequest(event)">
+                        <input type="hidden" id="modal-transaction-type" value="${transactionType}">
+                        
+                        <div class="modal-form-group">
+                            <label for="modal-region-code">📍 ${locationLabel} 지역코드</label>
+                            <input type="text" id="modal-region-code" placeholder="예: 1100000000" required>
+                        </div>
+                        
+                        <div class="modal-form-group">
+                            <label for="modal-address-detail">🏠 상세 주소</label>
+                            <input type="text" id="modal-address-detail" placeholder="${transactionType === 'IN_PERSON' ? '예: 강남역 5번 출구' : '예: 서울시 강남구 역삼동 123-45'}" required>
+                        </div>
+                        
+                        <div class="modal-form-group">
+                            <label for="modal-amount">💰 최종 협의 금액</label>
+                            <input type="number" id="modal-amount" placeholder="최종 거래 금액" required>
+                        </div>
+                        
+                        <button type="submit" class="modal-submit-btn">요청 보내기</button>
+                    </form>
+                </div>
+            </div>
+        `;
+        
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    }
+    window.openTradeModal = openTradeModal;
+
+    function closeTradeModal() {
+        const modal = document.getElementById('trade-modal');
+        if (modal) modal.remove();
+    }
+    window.closeTradeModal = closeTradeModal;
+
+    async function submitTradeRequest(e) {
+        e.preventDefault();
+        
+        const transactionType = document.getElementById('modal-transaction-type').value;
+        const regionCode = document.getElementById('modal-region-code').value;
+        const addressDetail = document.getElementById('modal-address-detail').value;
+        const amount = Number(document.getElementById('modal-amount').value);
+        
+        closeTradeModal();
+        
+        // 통합된 상태 변경 요청 함수 호출
+        await sendStatusChangeRequest(transactionType, {
+            regionCode,
+            addressDetail,
+            amount
+        });
+    }
+    window.submitTradeRequest = submitTradeRequest;
 
     function updateLastMessage(roomId, text) {
         const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
         if (roomItem) {
             const lastMessageElement = roomItem.querySelector('.room-last-message');
-            lastMessageElement.textContent = text;
+            if (lastMessageElement) {
+                lastMessageElement.textContent = text;
+            }
+        }
+    }
+
+    // 사이드바 채팅방의 상태 뱃지 업데이트
+    function updateRoomStatusBadge(roomId, status) {
+        const roomItem = document.querySelector(`[data-room-id="${roomId}"]`);
+        if (roomItem) {
+            roomItem.dataset.status = status;
+            const statusBadge = roomItem.querySelector('.room-status');
+            if (statusBadge) {
+                statusBadge.className = 'room-status ' + status.toLowerCase();
+                statusBadge.textContent = getStatusBadge(status);
+            }
         }
     }
 
@@ -640,14 +1546,47 @@
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
     }
 
-    function getStatusText(status) {
-        switch(status) {
-            case 'PENDING': return '협의중';
-            case 'IN_PERSON': return '직거래중';
-            case 'SHIPPING': return '배송중';
-            case 'CANCELED': return '거래취소';
-            case 'COMPLETED': return '거래완료';
-            default: return status;
+    // 페이지 로드 시 선택된 채팅방이 있으면 자동 선택
+    document.addEventListener('DOMContentLoaded', () => {
+        <% if (typeof selectedRoomId !== 'undefined' && selectedRoomId) { %>
+        const selectedRoomId = <%= selectedRoomId %>;
+        const roomElement = document.querySelector(`[data-room-id="${selectedRoomId}"]`);
+        if (roomElement) {
+            const roomId = roomElement.dataset.roomId;
+            const postId = roomElement.dataset.postId;
+            const postTitle = roomElement.dataset.postTitle;
+            const otherUser = roomElement.dataset.otherUser;
+            const status = roomElement.dataset.status;
+            selectRoom(roomId, postId, postTitle, otherUser, status, roomElement);
         }
-    }
+        <% } %>
+    });
 </script>
+
+<%
+function getStatusBadge(status) {
+    const statusMap = {
+        'PENDING': '🤝 협의중',
+        'IN_PERSON': '🚶 직거래',
+        'SHIPPING': '🚚 배송중',
+        'CANCELED': '❌ 취소',
+        'COMPLETED': '✅ 완료'
+    };
+    return statusMap[status] || '🤝 협의중';
+}
+
+function formatTimeAgo(dateInput) {
+    const date = new Date(dateInput);
+    const now = new Date();
+    const diffMs = now - date;
+    const diffMins = Math.floor(diffMs / 60000);
+    const diffHours = Math.floor(diffMs / 3600000);
+    const diffDays = Math.floor(diffMs / 86400000);
+    
+    if (diffMins < 1) return '방금 전';
+    if (diffMins < 60) return diffMins + '분 전';
+    if (diffHours < 24) return diffHours + '시간 전';
+    if (diffDays < 7) return diffDays + '일 전';
+    return date.toLocaleDateString('ko-KR');
+}
+%>

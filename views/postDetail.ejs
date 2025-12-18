@@ -180,9 +180,32 @@ function deletePost(postId) {
   }
 }
 
-// 판매자 연락
-function contactSeller() {
-  location.href = '/chat';
+// 판매자 연락 (채팅방 생성)
+async function contactSeller() {
+  const postId = <%= post.id %>;
+  
+  try {
+    const response = await fetch('/api/chat', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ postId: postId })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      // 채팅방이 생성되었거나 기존 채팅방을 찾았으면 해당 채팅방으로 바로 이동
+      const tradeId = result.data.id;
+      location.href = '/chat/' + tradeId;
+    } else {
+      alert(result.message || '채팅방 생성에 실패했습니다.');
+    }
+  } catch (error) {
+    console.error('Chat room creation error:', error);
+    alert('채팅방 생성 중 오류가 발생했습니다.');
+  }
 }
 
 // 관심상품 추가/제거

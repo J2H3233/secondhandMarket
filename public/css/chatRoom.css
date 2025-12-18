@@ -175,6 +175,145 @@
     clear: both;
 }
 
+/* 시스템 메시지 (상태 변경 알림 등) */
+.message.system {
+    display: block !important;
+    text-align: center !important;
+    margin: 15px auto !important;
+    max-width: 80% !important;
+    width: auto !important;
+    float: none !important;
+    clear: both !important;
+    background: #f0f0f0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 10px 20px !important;
+    border-radius: 20px !important;
+    font-size: 13px;
+    color: #666;
+}
+
+.message.system::before {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* 거래 요청 메시지 */
+.trade-request-message {
+    display: block !important;
+    text-align: center !important;
+    margin: 20px 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    float: none !important;
+    clear: both !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.trade-request-message::before {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+/* 거래 요청 카드 */
+.trade-request-card {
+    display: inline-block;
+    background: linear-gradient(135deg, #fff9e6 0%, #ffe6f0 100%);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 350px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255, 193, 7, 0.3);
+    text-align: left;
+}
+
+.trade-request-text {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: #333;
+    text-align: center;
+}
+
+.trade-request-details {
+    background: white;
+    border-radius: 12px;
+    padding: 15px;
+    margin-bottom: 15px;
+}
+
+.detail-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.detail-item:last-child {
+    border-bottom: none;
+}
+
+.detail-item.highlight {
+    background: #fff9e6;
+    margin: 0 -10px;
+    padding: 10px;
+    border-radius: 8px;
+}
+
+.detail-icon {
+    font-size: 20px;
+}
+
+.detail-label {
+    font-size: 12px;
+    color: #888;
+    min-width: 70px;
+}
+
+.detail-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    flex: 1;
+}
+
+.detail-value.price {
+    font-size: 16px;
+    font-weight: 700;
+    color: #ff6b6b;
+}
+
+.request-result {
+    padding: 10px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 10px;
+}
+
+.request-result.approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.request-result.rejected {
+    background: #f8d7da;
+    color: #721c24;
+}
+
+.trade-request-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
 .input-area {
     padding: 25px 30px;
     background-color: white;
@@ -369,4 +508,491 @@
     .input-container {
         gap: 10px;
     }
+}
+
+/* 채팅방 목록 아이템 개선 */
+.room-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.room-thumbnail {
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    flex-shrink: 0;
+}
+
+.room-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.room-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.room-other-user {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 4px;
+}
+
+.room-item.active .room-other-user {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.room-meta {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.room-status {
+    font-size: 0.7rem;
+    padding: 3px 8px;
+    border-radius: 12px;
+    font-weight: 500;
+    background: #f0f0f0;
+    color: #666;
+}
+
+.room-status.pending {
+    background: linear-gradient(135deg, #fff3cd 0%, #ffe69c 100%);
+    color: #856404;
+}
+
+.room-status.in_person {
+    background: linear-gradient(135deg, #d4edda 0%, #b8dfc2 100%);
+    color: #155724;
+}
+
+.room-status.shipping {
+    background: linear-gradient(135deg, #cce5ff 0%, #a8d4ff 100%);
+    color: #004085;
+}
+
+.room-status.canceled {
+    background: linear-gradient(135deg, #f8d7da 0%, #f5c6cb 100%);
+    color: #721c24;
+}
+
+.room-status.completed {
+    background: linear-gradient(135deg, #d1e7dd 0%, #badbcc 100%);
+    color: #0f5132;
+}
+
+.room-time {
+    font-size: 11px;
+    color: #999;
+}
+
+.room-item.active .room-time {
+    color: rgba(255, 255, 255, 0.7);
+}
+
+/* 거래 요청 모달 */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+    position: relative;
+}
+
+.modal-close {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 28px;
+    font-weight: bold;
+    color: #aaa;
+    cursor: pointer;
+    transition: color 0.3s;
+}
+
+.modal-close:hover {
+    color: #333;
+}
+
+.modal-content h2 {
+    margin: 0 0 25px 0;
+    font-size: 22px;
+    color: #333;
+    text-align: center;
+}
+
+.modal-form-group {
+    margin-bottom: 20px;
+}
+
+.modal-form-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.modal-form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.modal-form-group input:focus {
+    outline: none;
+    border-color: #64b5f6;
+}
+
+.modal-submit-btn {
+    width: 100%;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-size: 16px;
+    font-weight: 600;
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    color: white;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-top: 10px;
+}
+
+.modal-submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(100, 181, 246, 0.4);
+}
+
+.modal-content h3 {
+    margin: 0 0 20px 0;
+    font-size: 20px;
+    color: #333;
+    text-align: center;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: #555;
+    font-size: 14px;
+}
+
+.form-group input,
+.form-group select {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: #64b5f6;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+}
+
+.modal-buttons button {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #64b5f6 0%, #42a5f5 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(100, 181, 246, 0.4);
+}
+
+.btn-secondary {
+    background: #e9ecef;
+    color: #333;
+}
+
+.btn-secondary:hover {
+    background: #dee2e6;
+}
+
+/* 거래 요청 버튼 */
+.request-status-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.request-status-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+
+/* 거래 요청 메시지 스타일 */
+.trade-request-btn {
+    padding: 8px 16px;
+    border: none;
+    border-radius: 5px;
+    font-size: 13px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.trade-request-btn.accept {
+    background: #28a745;
+    color: white;
+}
+
+.trade-request-btn.accept:hover {
+    background: #218838;
+}
+
+.trade-request-btn.reject {
+    background: #dc3545;
+    color: white;
+}
+
+.trade-request-btn.reject:hover {
+    background: #c82333;
+}
+
+.trade-request-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 헤더 영역 수정 */
+.chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 20px 25px;
+}
+
+.trade-status-area {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+/* 채팅방 없음 메시지 */
+.no-rooms-message {
+    padding: 40px;
+    text-align: center;
+    color: #888;
+}
+
+.no-rooms-message i {
+    font-size: 48px;
+    margin-bottom: 15px;
+    display: block;
+    color: #ccc;
+}
+
+/* 상태 변경 요청 카드 */
+.status-change-request {
+    display: block !important;
+    text-align: center !important;
+    margin: 20px 0 !important;
+    max-width: 100% !important;
+    width: 100% !important;
+    float: none !important;
+    clear: both !important;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+}
+
+.status-change-request::before {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.status-change-card {
+    display: inline-block;
+    background: linear-gradient(135deg, #e3f2fd 0%, #f3e5f5 100%);
+    border-radius: 16px;
+    padding: 20px;
+    max-width: 320px;
+    width: 100%;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(144, 202, 249, 0.3);
+}
+
+.status-change-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.status-change-header-icon {
+    font-size: 24px;
+}
+
+.status-change-header-title {
+    font-weight: 600;
+    font-size: 14px;
+    color: #333;
+}
+
+.status-change-body {
+    text-align: center;
+}
+
+.status-change-from-to {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 12px;
+}
+
+.status-change-badge {
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13px;
+    font-weight: 500;
+}
+
+.status-change-badge.old {
+    background: #e9ecef;
+    color: #666;
+}
+
+.status-change-badge.new {
+    background: linear-gradient(135deg, #90caf9 0%, #ce93d8 100%);
+    color: white;
+}
+
+.status-change-arrow {
+    font-size: 18px;
+    color: #666;
+}
+
+.status-change-requester {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 15px;
+}
+
+.status-change-buttons {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+}
+
+.status-change-btn {
+    padding: 10px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.status-change-btn.accept {
+    background: #28a745;
+    color: white;
+}
+
+.status-change-btn.accept:hover {
+    background: #218838;
+    transform: translateY(-1px);
+}
+
+.status-change-btn.reject {
+    background: #dc3545;
+    color: white;
+}
+
+.status-change-btn.reject:hover {
+    background: #c82333;
+    transform: translateY(-1px);
+}
+
+.status-change-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.status-change-result {
+    padding: 12px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    text-align: center;
+}
+
+.status-change-result.pending {
+    background: #fff3cd;
+    color: #856404;
+}
+
+.status-change-result.approved {
+    background: #d4edda;
+    color: #155724;
+}
+
+.status-change-result.rejected {
+    background: #f8d7da;
+    color: #721c24;
 }

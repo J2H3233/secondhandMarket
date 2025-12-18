@@ -15,6 +15,7 @@ import { responseHandler } from './middlewares/responseHandler.js';
 import expressLayouts from 'express-ejs-layouts';
 import { createServer } from 'http';
 import { Server } from 'socket.io';
+import { sendChatMessage } from './services/chat.service.js';
 
 dotenv.config();
 
@@ -93,24 +94,56 @@ io.on('connection', (socket) => {
     });
   });
 
-    // 1. 상태 변경 요청 수신
-    socket.on('request_status_change', (data) => {
-        // data: { room, user, userName, status, timestamp }
-        // 같은 방의 다른 사용자에게 전송
-        socket.to(data.room).emit('receive_status_change_request', data);
-    });
-
-    // 2. 상태 변경 응답 수신
-    socket.on('respond_status_change', (data) => {
-        // data: { room, requestId, accepted, status, user }
-        // 요청자에게 응답 전송
-        socket.to(data.room).emit('status_change_response', data);
-    });
-
-    // 3. 메시지 전송 시 userName 포함
-    socket.on('send_message', (data) => {
+    // 2. 메시지 전송 (DB에 저장 후 브로드캐스트)
+    socket.on('send_message', async (data) => {
         // data: { room, user, userName, message, image }
-        io.to(data.room).emit('receive_message', data);
+        console.log('메시지 수신:', data);
+        
+        try {
+            const tradeId = Number(data.room);
+            const senderId = Number(data.user);
+            const content = data.message || null;
+            const imageUrl = data.image || undefined;
+
+            console.log('메시지 저장 시도:', { tradeId, senderId, content: content?.substring(0, 50) });
+
+            // DB에 메시지 저장
+            const savedMessage = await sendChatMessage(
+                tradeId,
+                senderId,
+                content,
+                'NORMAL',
+                imageUrl
+            );
+
+            console.log('메시지 저장 성공:', savedMessage.id);
+
+            // 저장된 메시지 ID와 함께 브로드캐스트
+            io.to(data.room).emit('receive_message', {
+                ...data,
+                messageId: savedMessage.id,
+                createdAt: savedMessage.created_at
+            });
+        } catch (error) {
+            console.error('메시지 저장 오류:', error);
+            // 저장 실패해도 일단 브로드캐스트 (UX 유지)
+            io.to(data.room).emit('receive_message', data);
+        }
+    });
+
+    // 3. 상태 변경 요청 전송 (통합)
+    socket.on('send_status_request', (data) => {
+        // data: { room, user, userName, messageId, requestedStatus, currentStatus, regionName, addressDetail, amount }
+        console.log('상태 변경 요청 수신 (서버):', data);
+        socket.to(data.room).emit('receive_status_request', data);
+        console.log('상태 변경 요청 전달 완료:', data.room);
+    });
+
+    // 4. 상태 변경 요청 응답 (통합)
+    socket.on('status_request_response', (data) => {
+        // data: { room, messageId, approved, newStatus }
+        console.log('상태 변경 응답 수신 (서버):', data);
+        socket.to(data.room).emit('status_request_response', data);
     });
 
   socket.on('disconnect', () => {
