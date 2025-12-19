@@ -1,6 +1,6 @@
 import type { Request, Response, NextFunction } from "express";
 import type { CreatePostRequestBody } from "../types/post.type.js";
-import { createPostSevice, getPost, softdeletePostByIdService, getPostDetails } from "../services/post.service.js";
+import { createPostSevice, getPost, softdeletePostByIdService, getPostDetails, getLatestPosts } from "../services/post.service.js";
 import { CustomError, ErrorCodes } from "../errors/customError.js";
 
 
@@ -121,5 +121,22 @@ export const ssrhandlerGetPost = async (req: Request<{ id: number }, {}, {}>, re
             showHeader: true,
             showFooter: true 
         });
+    }
+}
+
+// API: 게시글 목록 조회 (페이징 지원)
+export const handlerGetPosts = async (
+    req: Request<{}, {}, {}, { limit?: string; offset?: string }>,
+    res: Response,
+    next: NextFunction
+): Promise<void> => {
+    try {
+        const limit = req.query.limit ? Number(req.query.limit) : 21;
+        const offset = req.query.offset ? Number(req.query.offset) : 0;
+        
+        const posts = await getLatestPosts(limit, offset);
+        res.jsonSuccess(posts, '게시글 목록 조회에 성공했습니다.', 200);
+    } catch (error) {
+        next(error);
     }
 }

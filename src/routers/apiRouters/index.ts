@@ -5,6 +5,8 @@ import postRouter from './post.js';
 import userRouter from './user.js';
 import categoryRouter from './category.js';
 import chatRouter from './chat.js';
+import favoriteRouter from './favorite.js';
+import reviewRouter from './review.js';
 
 const router : Router = Router(); 
 
@@ -20,5 +22,9 @@ router.use('/user', userRouter);
 router.use('/category', categoryRouter);
 
 router.use('/chat', chatRouter);
+
+router.use('/favorite', favoriteRouter);
+
+router.use('/review', reviewRouter);
 
 export default router;

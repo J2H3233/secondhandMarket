@@ -17,6 +17,7 @@ enum PostStatus {
 enum PostTransactionType {
   IN_PERSON // 직거래
   PARCEL // 택배
+  BOTH // 둘다 가능
 }
 
 // trade.status

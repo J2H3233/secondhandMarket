@@ -51,10 +51,9 @@
             <option value="의류/패션">의류/패션</option>
             <option value="도서/문구">도서/문구</option>
             <option value="생활용품">생활용품</option>
-            <option value="스포츠/레저">스포츠/레저</option>
-            <option value="뷰티/화장품">뷰티/화장품</option>
+            <option value="미용">미용</option>
             <option value="식품">식품</option>
-            <option value="기타">기타</option>
+            <option value="스포츠">스포츠</option>
           </select>
         </div>
         
@@ -62,6 +61,29 @@
           <label for="content">상품 설명 <span class="required">*</span></label>
           <textarea id="content" name="content" placeholder="상품에 대해 자세히 설명해주세요&#10;&#10;• 상품 상태&#10;• 구매 시기&#10;• 사용감&#10;• 교환/환불 가능 여부 등" rows="8" required></textarea>
           <div class="char-count">0/2000</div>
+        </div>
+      </div>
+
+      <!-- 거래 방식 -->
+      <div class="form-section">
+        <h3><i class="fas fa-handshake"></i> 거래 방식</h3>
+        
+        <div class="form-group">
+          <label for="transaction_type">거래 방식 <span class="required">*</span></label>
+          <div class="transaction-options">
+            <label class="radio-option">
+              <input type="radio" name="transaction_type" value="IN_PERSON" required onchange="updateTransactionType()">
+              <span><i class="fas fa-handshake"></i> 직거래만</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="transaction_type" value="PARCEL" required onchange="updateTransactionType()">
+              <span><i class="fas fa-box"></i> 택배만</span>
+            </label>
+            <label class="radio-option">
+              <input type="radio" name="transaction_type" value="BOTH" required onchange="updateTransactionType()">
+              <span><i class="fas fa-truck"></i> 둘다 가능</span>
+            </label>
+          </div>
         </div>
       </div>
 
@@ -79,43 +101,25 @@
         
         <div class="form-group">
           <label>배송비</label>
-          <div class="delivery-options">
+          <div class="delivery-options" id="deliveryOptions">
             <label class="radio-option">
-              <input type="radio" name="delivery_option" value="free" checked onchange="updateDeliveryCharge()">
+              <input type="radio" name="delivery_option" value="free" checked onchange="updateDeliveryCharge()" disabled>
               <span><i class="fas fa-shipping-fast"></i> 무료배송</span>
             </label>
             <label class="radio-option">
-              <input type="radio" name="delivery_option" value="charged" onchange="updateDeliveryCharge()">
+              <input type="radio" name="delivery_option" value="charged" onchange="updateDeliveryCharge()" disabled>
               <span><i class="fas fa-won-sign"></i> 배송비 별도</span>
             </label>
           </div>
           <div class="delivery-charge-input" style="display: none;">
             <div class="price-input-group">
-              <input type="number" id="delivery_charge_input" placeholder="배송비를 입력해주세요" min="0" max="999999">
+              <input type="number" id="delivery_charge_input" placeholder="배송비를 입력해주세요" min="0" max="999999" disabled>
               <span class="price-unit">원</span>
             </div>
           </div>
           <!-- 실제 전송될 hidden input -->
           <input type="hidden" id="delivery_charge" name="delivery_charge" value="0">
-        </div>
-      </div>
-
-      <!-- 거래 방식 -->
-      <div class="form-section">
-        <h3><i class="fas fa-handshake"></i> 거래 방식</h3>
-        
-        <div class="form-group">
-          <label for="transaction_type">거래 방식 <span class="required">*</span></label>
-          <div class="transaction-options">
-            <label class="radio-option">
-              <input type="radio" name="transaction_type" value="IN_PERSON" required>
-              <span><i class="fas fa-handshake"></i> 직거래</span>
-            </label>
-            <label class="radio-option">
-              <input type="radio" name="transaction_type" value="PARCEL" required>
-              <span><i class="fas fa-box"></i> 택배</span>
-            </label>
-          </div>
+          <div class="form-help" id="deliveryHelp" style="color: #94a3b8; margin-top: 8px;">거래 방식을 먼저 선택해주세요</div>
         </div>
       </div>
 
@@ -124,9 +128,9 @@
         <h3><i class="fas fa-map-marker-alt"></i> 거래 지역</h3>
         
         <div class="form-group">
-          <label for="region_code">지역코드 <span class="required">*</span></label>
-          <input type="text" id="region_code" name="region_code" placeholder="10자리 지역코드를 입력하세요" pattern="[0-9]{10}" maxlength="10" required>
-          <div class="form-help">예: 1100000000 (서울특별시)</div>
+          <label for="region_code">거래 지역 <span class="required">*</span></label>
+          <input type="text" id="region_code" name="region_code" placeholder="주소 또는 10자리 지역코드를 입력하세요" maxlength="100" required>
+          <div class="form-help">예: 서울특별시 성북구 삼선동 또는 1129010700</div>
         </div>
       </div>
 
@@ -180,6 +184,29 @@ function removeImage(index) {
   
   input.files = dt.files;
   previewImages(input);
+}
+
+// 거래 방식 변경 시 배송비 옵션 활성화/비활성화
+function updateTransactionType() {
+  const transactionType = document.querySelector('input[name="transaction_type"]:checked').value;
+  const deliveryOptions = document.querySelectorAll('input[name="delivery_option"]');
+  const deliveryChargeInputField = document.getElementById('delivery_charge_input');
+  const deliveryHelp = document.getElementById('deliveryHelp');
+  
+  if (transactionType === 'IN_PERSON') {
+    // 직거래만: 배송비 옵션 비활성화
+    deliveryOptions.forEach(opt => opt.disabled = true);
+    deliveryChargeInputField.disabled = true;
+    document.querySelector('.delivery-charge-input').style.display = 'none';
+    document.getElementById('delivery_charge').value = '0';
+    deliveryHelp.textContent = '직거래만 가능하므로 배송비가 없습니다';
+    deliveryHelp.style.display = 'block';
+  } else {
+    // 택배 또는 둘다: 배송비 옵션 활성화
+    deliveryOptions.forEach(opt => opt.disabled = false);
+    deliveryChargeInputField.disabled = false;
+    deliveryHelp.style.display = 'none';
+  }
 }
 
 // 배송비 입력 필드 토글 및 값 설정

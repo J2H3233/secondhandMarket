@@ -580,6 +580,9 @@
         flex: 1;
         font-weight: 500;
         text-align: right;
+        word-break: keep-all;
+        overflow-wrap: break-word;
+        line-height: 1.4;
     }
 
     .detail-value.price {
@@ -661,10 +664,10 @@
                         <% chatRooms.forEach(function(room) { %>
                             <div class="room-item" data-room-id="<%= room.id %>" data-post-id="<%= room.postId %>" data-post-title="<%= room.postTitle || '상품명 없음' %>" data-other-user="<%= room.otherUserName %>" data-status="<%= room.status %>">
                                 <div class="room-thumbnail">
-                                    <% if (room.postImageUrl) { %>
-                                        <img src="/uploads/temp/<%= room.postImageUrl %>" alt="상품 이미지">
+                                    <% if (room.postImageUrl && room.postImageUrl.trim() !== '') { %>
+                                        <img src="/uploads/temp/<%= room.postImageUrl %>" alt="상품 이미지" onerror="this.src='https://via.placeholder.com/50x50/f8f9fa/6c757d?text=No+Image'">
                                     <% } else { %>
-                                        <img src="https://via.placeholder.com/50x50/E2E8F0/718096?text=No" alt="이미지 없음">
+                                        <img src="https://via.placeholder.com/50x50/f8f9fa/6c757d?text=No+Image" alt="이미지 없음">
                                     <% } %>
                                 </div>
                                 <div class="room-info">
@@ -1035,15 +1038,15 @@
             
             console.log('API 응답:', result);
             console.log('응답 상세:', { 
-                code: result.code, 
-                hasResult: !!result.result,
-                messages: result.result?.messages,
-                messagesCount: result.result?.messages?.length,
-                hasMore: result.result?.hasMore
+                success: result.success, 
+                hasData: !!result.data,
+                messages: result.data?.messages,
+                messagesCount: result.data?.messages?.length,
+                hasMore: result.data?.hasMore
             });
             
-            if (result.code === 200 && result.result) {
-                const { messages, hasMore } = result.result;
+            if (result.success && result.data) {
+                const { messages, hasMore } = result.data;
                 hasMoreMessages = hasMore;
                 
                 if (messages.length > 0) {
@@ -1067,7 +1070,7 @@
                                     addStatusRequestToDOM({
                                         requestId: msg.id,
                                         userName: msg.senderName,
-                                        requestedStatus: requestData.requestedStatus || requestData.transactionType,
+                                        requestedStatus: requestData.requestedStatus,
                                         currentStatus: requestData.currentStatus,
                                         regionName: requestData.regionName,
                                         addressDetail: requestData.addressDetail,
@@ -1119,7 +1122,7 @@
                 }
                 
                 // 더 이상 메시지가 없으면 로딩 트리거 숨김
-                loadMoreTrigger.style.display = hasMore ? 'none' : 'none';
+                loadMoreTrigger.style.display = hasMore ? 'block' : 'none';
             }
         } catch (error) {
             console.error('메시지 로드 오류:', error);
@@ -1232,6 +1235,13 @@
             }
         } else {
             messagesContainer.appendChild(messageDiv);
+            // 이미지가 있는 경우 이미지 로드 완료 후 스크롤
+            if (msg.image && !prepend) {
+                const imgElement = messageDiv.querySelector('img');
+                if (imgElement) {
+                    imgElement.onload = () => scrollToBottom();
+                }
+            }
         }
     }
 
@@ -1359,23 +1369,23 @@
                     room: currentRoomId,
                     user: myUserId,
                     userName: myUserName,
-                    messageId: result.result.message.id,
+                    messageId: result.data.message.id,
                     requestedStatus: requestedStatus,
                     currentStatus: currentStatus,
-                    regionName: result.result.requestData?.regionName,
-                    addressDetail: result.result.requestData?.addressDetail,
-                    amount: result.result.requestData?.amount
+                    regionName: result.data.requestData?.regionName,
+                    addressDetail: result.data.requestData?.addressDetail,
+                    amount: result.data.requestData?.amount
                 });
                 
                 // 내 화면에도 표시
                 addStatusRequestToDOM({
-                    requestId: result.result.message.id,
+                    requestId: result.data.message.id,
                     userName: myUserName,
                     requestedStatus: requestedStatus,
                     currentStatus: currentStatus,
-                    regionName: result.result.requestData?.regionName,
-                    addressDetail: result.result.requestData?.addressDetail,
-                    amount: result.result.requestData?.amount,
+                    regionName: result.data.requestData?.regionName,
+                    addressDetail: result.data.requestData?.addressDetail,
+                    amount: result.data.requestData?.amount,
                     isMine: true
                 });
                 
@@ -1407,13 +1417,13 @@
             const result = await response.json();
             console.log('응답 결과:', result);
             
-            if (result.code === 200) {
+            if (result.success) {
                 // 소켓으로 상대방에게 알림
                 socket.emit('status_request_response', {
                     room: currentRoomId,
                     messageId: messageId,
                     approved: approved,
-                    newStatus: result.result?.newStatus
+                    newStatus: result.data?.newStatus
                 });
                 
                 // 버튼 비활성화 및 상태 표시
@@ -1422,7 +1432,7 @@
                     const buttonsArea = requestDiv.querySelector('.trade-request-buttons');
                     
                     if (approved) {
-                        currentStatus = result.result?.newStatus || currentStatus;
+                        currentStatus = result.data?.newStatus || currentStatus;
                         updateStatusBadge(currentStatus);
                         updateRoomStatusBadge(currentRoomId, currentStatus);
                         if (buttonsArea) {
@@ -1470,8 +1480,11 @@
                         <input type="hidden" id="modal-transaction-type" value="${transactionType}">
                         
                         <div class="modal-form-group">
-                            <label for="modal-region-code">📍 ${locationLabel} 지역코드</label>
-                            <input type="text" id="modal-region-code" placeholder="예: 1100000000" required>
+                            <label for="modal-region-code">📍 ${locationLabel} 지역</label>
+                            <input type="text" id="modal-region-code" placeholder="예: 서울특별시 성북구 삼선동 또는 1129010700" required>
+                            <small style="color: #718096; font-size: 12px; margin-top: 4px; display: block;">
+                                주소 또는 10자리 지역코드를 입력하세요
+                            </small>
                         </div>
                         
                         <div class="modal-form-group">

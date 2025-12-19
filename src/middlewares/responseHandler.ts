@@ -11,14 +11,31 @@ export const responseHandler = (
     code: number,
   ) => {
 
-    const httpStatus: number = res.statusCode || 200;
+    const httpStatus: number = code || res.statusCode || 200;
 
     return res.status(httpStatus).json({
-      code: code,
+      success: true,
+      code: httpStatus,
       message: message,
-      result: data,
+      data: data,
     });
   };
 
   next();
+};
+
+export const successResponse = (data: any, message: string = '요청에 성공했습니다.') => {
+  return {
+    success: true,
+    message: message,
+    data: data,
+  };
+};
+
+export const errorResponse = (message: string, code?: number) => {
+  return {
+    success: false,
+    message: message,
+    code: code,
+  };
 };

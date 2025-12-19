@@ -15,6 +15,28 @@ import {
 import { findPostById } from "../repositories/post.repository.js";
 import type { TradeStatus, MessageType } from "@prisma/client";
 
+// 하드코딩: 주소를 지역코드로 변환
+const convertAddressToRegionCode = (address: string): string => {
+    // 입력값 정규화 (공백 제거, 소문자 변환)
+    const normalized = address.replace(/\s+/g, '').toLowerCase();
+    
+    // 서울특별시 성북구 삼선동의 다양한 표현 지원
+    const samseondongPatterns = [
+        '서울특별시성북구삼선동',
+        '서울성북구삼선동',
+        '성북구삼선동',
+        '삼선동'
+    ];
+    
+    if (samseondongPatterns.some(pattern => normalized.includes(pattern.toLowerCase()))) {
+        console.log(`주소 "${address}" -> 지역코드 1129010700 변환`);
+        return '1129010700';
+    }
+    
+    console.log(`주소 "${address}"는 변환되지 않음 (그대로 반환)`);
+    return address; // 주소가 아니면 그대로 반환 (지역코드로 간주)
+};
+
 // ============================================
 // 상태 관련 상수 및 타입
 // ============================================
@@ -208,13 +230,22 @@ export const createStatusChangeRequest = async (
                 throw new CustomError(400, ErrorCodes.VALIDATION_FAILED, '직거래/배송 요청에는 지역, 상세주소, 금액 정보가 필요합니다.');
             }
             
+            // 주소를 지역코드로 변환 (하드코딩)
+            const convertedRegionCode = convertAddressToRegionCode(additionalInfo.regionCode);
+            
             // 지역 정보 조회
-            const region = await findRegionByCode(additionalInfo.regionCode, tx);
+            const region = await findRegionByCode(convertedRegionCode, tx);
             if (region) {
-                regionName = `${region.sido || ''} ${region.sigungu || ''} ${region.eubmyeonli || ''}`.trim();
+                // 시도, 시군구, 읍면리 조합
+                const parts = [region.sido, region.sigungu, region.eubmyeonli].filter(part => part && part.trim());
+                regionName = parts.length > 0 ? parts.join(' ') : '지역정보 확인 필요';
             } else {
-                regionName = additionalInfo.regionCode;
+                // DB에 지역 정보가 없는 경우
+                regionName = '지역정보 확인 필요';
             }
+            
+            // 변환된 지역코드를 additionalInfo에 반영
+            additionalInfo.regionCode = convertedRegionCode;
         }
 
         // 요청 메시지 내용 구성

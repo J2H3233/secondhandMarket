@@ -54,3 +54,54 @@ export const createUser = async (username: string, phone_num: string, region_id:
     }
 };
 
+export const findUserById = async (id: number, client: DBClient = prisma) => {
+    try {
+        return await client.user.findUnique({
+            where: { id: id },
+            include: {
+                region: true,
+                user_local_account: {
+                    select: {
+                        email: true
+                    }
+                }
+            }
+        });
+    } catch (error) {
+        console.error(error);
+        throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '사용자 조회시 db 오류가 발생했습니다.');
+    }
+};
+
+export const updateUser = async (
+    userId: number,
+    username: string,
+    phone_num: string,
+    address_detail: string,
+    region_id?: number,
+    client: DBClient = prisma
+) => {
+    try {
+        const updateData: any = {
+            username: username,
+            phone_num: phone_num,
+            address_detail: address_detail
+        };
+        
+        // region_id가 제공되면 업데이트
+        if (region_id !== undefined) {
+            updateData.region = {
+                connect: { id: region_id }
+            };
+        }
+        
+        return await client.user.update({
+            where: { id: userId },
+            data: updateData
+        });
+    } catch (error) {
+        console.error(error);
+        throw new CustomError(500, ErrorCodes.DB_OPERATION_FAILED, '사용자 정보 업데이트시 db 오류가 발생했습니다.');
+    }
+};
+

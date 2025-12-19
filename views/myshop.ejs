@@ -125,17 +125,1458 @@
             <% if (currentPage === 'info') { %>
                 <p class="myshop-content-text">사용자 정보를 수정할 수 있습니다.</p>
                 
+                <% if (typeof userInfo !== 'undefined' && userInfo) { %>
+                    <form id="userInfoForm" class="user-info-form">
+                        <div class="form-group">
+                            <label for="username">이름</label>
+                            <input type="text" id="username" name="username" value="<%= userInfo.username %>" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="email">이메일</label>
+                            <input type="email" id="email" value="<%= userInfo.user_local_account?.email || '' %>" disabled>
+                            <small class="form-help">이메일은 변경할 수 없습니다.</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="phone_num">전화번호</label>
+                            <input type="tel" id="phone_num" name="phone_num" value="<%= userInfo.phone_num || '' %>" placeholder="010-1234-5678">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="region_code">지역</label>
+                            <input type="text" id="region_code" name="region_code" value="" placeholder="예: 서울특별시 성북구 삼선동">
+                            <small class="form-help">현재 지역: <%= userInfo.region ? (userInfo.region.sido || '') + ' ' + (userInfo.region.sigungu || '') + ' ' + (userInfo.region.eubmyeonli || '') : '지역정보 없음' %> (변경하려면 입력하세요)</small>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="address_detail">상세 주소</label>
+                            <input type="text" id="address_detail" name="address_detail" value="<%= userInfo.address_detail || '' %>" placeholder="상세 주소를 입력하세요">
+                        </div>
+                        
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">저장하기</button>
+                            <button type="button" class="btn btn-secondary" onclick="window.location.reload()">취소</button>
+                        </div>
+                    </form>
+                    
+                    <style>
+                        .user-info-form {
+                            max-width: 600px;
+                            margin: 30px 0;
+                        }
+                        
+                        .form-group {
+                            margin-bottom: 24px;
+                        }
+                        
+                        .form-group label {
+                            display: block;
+                            font-size: 14px;
+                            font-weight: 600;
+                            color: #2d3748;
+                            margin-bottom: 8px;
+                        }
+                        
+                        .form-group input {
+                            width: 100%;
+                            padding: 12px 16px;
+                            border: 1px solid #e2e8f0;
+                            border-radius: 8px;
+                            font-size: 15px;
+                            transition: all 0.2s ease;
+                        }
+                        
+                        .form-group input:focus {
+                            outline: none;
+                            border-color: #667eea;
+                            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                        }
+                        
+                        .form-group input:disabled {
+                            background: #f7fafc;
+                            color: #a0aec0;
+                            cursor: not-allowed;
+                        }
+                        
+                        .form-help {
+                            display: block;
+                            margin-top: 6px;
+                            font-size: 13px;
+                            color: #718096;
+                        }
+                        
+                        .form-actions {
+                            display: flex;
+                            gap: 12px;
+                            margin-top: 32px;
+                        }
+                        
+                        .form-actions .btn {
+                            flex: 1;
+                            padding: 14px 24px;
+                            border: none;
+                            border-radius: 8px;
+                            font-size: 16px;
+                            font-weight: 600;
+                            cursor: pointer;
+                            transition: all 0.2s ease;
+                        }
+                        
+                        .form-actions .btn-primary {
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                        }
+                        
+                        .form-actions .btn-primary:hover {
+                            transform: translateY(-2px);
+                            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+                        }
+                        
+                        .form-actions .btn-secondary {
+                            background: #e2e8f0;
+                            color: #4a5568;
+                        }
+                        
+                        .form-actions .btn-secondary:hover {
+                            background: #cbd5e0;
+                        }
+                        
+                        @media (max-width: 768px) {
+                            .user-info-form {
+                                max-width: 100%;
+                            }
+                            
+                            .form-actions {
+                                flex-direction: column;
+                            }
+                        }
+                    </style>
+                    
+                    <script>
+                        document.getElementById('userInfoForm').addEventListener('submit', async function(e) {
+                            e.preventDefault();
+                            
+                            const formData = {
+                                username: document.getElementById('username').value,
+                                phone_num: document.getElementById('phone_num').value,
+                                address_detail: document.getElementById('address_detail').value,
+                                region_code: document.getElementById('region_code').value
+                            };
+                            
+                            try {
+                                const response = await fetch('/api/user/update', {
+                                    method: 'PUT',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify(formData)
+                                });
+                                
+                                const data = await response.json();
+                                
+                                if (data.success) {
+                                    alert('정보가 성공적으로 수정되었습니다.');
+                                    window.location.reload();
+                                } else {
+                                    alert(data.message || '정보 수정에 실패했습니다.');
+                                }
+                            } catch (error) {
+                                console.error('Error:', error);
+                                alert('정보 수정 중 오류가 발생했습니다.');
+                            }
+                        });
+                    </script>
+                <% } %>
+                
             <% } else if (currentPage === 'posts') { %>
                 <p class="myshop-content-text">작성한 게시글 목록입니다.</p>
+                
+                <div class="my-posts-grid" id="myPostsGrid">
+                    <% if (typeof posts !== 'undefined' && posts && posts.length > 0) { %>
+                        <% posts.forEach(function(post) { %>
+                            <div class="my-post-card" data-post-id="<%= post.id %>">
+                                <a href="/post/<%= post.id %>" class="my-post-link">
+                                    <div class="my-post-image">
+                                        <% if (post.imageUrl && post.imageUrl.trim() !== '') { %>
+                                            <img src="/uploads/temp/<%= post.imageUrl %>" alt="<%= post.title %>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="no-image-placeholder" style="display: none;">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="no-image-placeholder">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        <% } %>
+                                        <div class="my-post-status <%= post.status.toLowerCase() %>">
+                                            <%= post.status === 'OPEN' ? '판매중' : '판매완료' %>
+                                        </div>
+                                    </div>
+                                    <div class="my-post-info">
+                                        <div class="my-post-details">
+                                            <h3 class="my-post-title"><%= post.title %></h3>
+                                            <p class="my-post-price"><%= Number(post.price).toLocaleString() %>원</p>
+                                            <div class="my-post-meta">
+                                                <span class="my-post-region">
+                                                    <i class="fas fa-map-marker-alt"></i>
+                                                    <%= post.region %>
+                                                </span>
+                                                <span class="my-post-category">
+                                                    <i class="fas fa-tag"></i>
+                                                    <%= post.category %>
+                                                </span>
+                                            </div>
+                                        </div>
+                                        <div class="my-post-actions">
+                                            <a href="/post/<%= post.id %>/edit" class="btn-edit" onclick="event.stopPropagation(); event.preventDefault(); window.location.href='/post/<%= post.id %>/edit';">
+                                                <i class="fas fa-edit"></i>
+                                                수정
+                                            </a>
+                                        </div>
+                                    </div>
+                                </a>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="empty-posts">
+                            <i class="far fa-file-alt" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                            <p>작성한 게시글이 없습니다.</p>
+                            <a href="/post/create" class="btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 24px; text-decoration: none;">게시글 작성하기</a>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <% if (typeof pagination !== 'undefined' && pagination.totalPages > 1) { %>
+                    <div class="pagination">
+                        <% if (pagination.currentPage > 1) { %>
+                            <a href="/myshop/posts?page=<%= pagination.currentPage - 1 %>" class="pagination-btn">
+                                <i class="fas fa-chevron-left"></i>
+                            </a>
+                        <% } else { %>
+                            <span class="pagination-btn disabled">
+                                <i class="fas fa-chevron-left"></i>
+                            </span>
+                        <% } %>
+                        
+                        <div class="pagination-numbers">
+                            <% 
+                                const maxButtons = 5;
+                                let startPage = Math.max(1, pagination.currentPage - Math.floor(maxButtons / 2));
+                                let endPage = Math.min(pagination.totalPages, startPage + maxButtons - 1);
+                                
+                                if (endPage - startPage < maxButtons - 1) {
+                                    startPage = Math.max(1, endPage - maxButtons + 1);
+                                }
+                            %>
+                            
+                            <% if (startPage > 1) { %>
+                                <a href="/myshop/posts?page=1" class="pagination-number">1</a>
+                                <% if (startPage > 2) { %>
+                                    <span class="pagination-ellipsis">...</span>
+                                <% } %>
+                            <% } %>
+                            
+                            <% for (let i = startPage; i <= endPage; i++) { %>
+                                <% if (i === pagination.currentPage) { %>
+                                    <span class="pagination-number active"><%= i %></span>
+                                <% } else { %>
+                                    <a href="/myshop/posts?page=<%= i %>" class="pagination-number"><%= i %></a>
+                                <% } %>
+                            <% } %>
+                            
+                            <% if (endPage < pagination.totalPages) { %>
+                                <% if (endPage < pagination.totalPages - 1) { %>
+                                    <span class="pagination-ellipsis">...</span>
+                                <% } %>
+                                <a href="/myshop/posts?page=<%= pagination.totalPages %>" class="pagination-number"><%= pagination.totalPages %></a>
+                            <% } %>
+                        </div>
+                        
+                        <% if (pagination.currentPage < pagination.totalPages) { %>
+                            <a href="/myshop/posts?page=<%= pagination.currentPage + 1 %>" class="pagination-btn">
+                                <i class="fas fa-chevron-right"></i>
+                            </a>
+                        <% } else { %>
+                            <span class="pagination-btn disabled">
+                                <i class="fas fa-chevron-right"></i>
+                            </span>
+                        <% } %>
+                    </div>
+                <% } %>
+                
+                <style>
+                    .my-posts-grid {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                        margin-top: 30px;
+                    }
+                    
+                    .my-post-card {
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                        position: relative;
+                    }
+                    
+                    .my-post-card:hover {
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                        transform: translateY(-2px);
+                    }
+                    
+                    .my-post-link {
+                        display: flex;
+                        text-decoration: none;
+                        color: inherit;
+                        height: 140px;
+                    }
+                    
+                    .my-post-image {
+                        position: relative;
+                        width: 180px;
+                        min-width: 180px;
+                        background: #f7fafc;
+                        overflow: hidden;
+                    }
+                    
+                    .my-post-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    
+                    .no-image-placeholder {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: #edf2f7;
+                        color: #a0aec0;
+                        font-size: 48px;
+                    }
+                    
+                    .my-post-status {
+                        position: absolute;
+                        top: 12px;
+                        left: 12px;
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: white;
+                        z-index: 1;
+                    }
+                    
+                    .my-post-status.open {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    }
+                    
+                    .my-post-status.close {
+                        background: #718096;
+                    }
+                    
+                    .my-post-info {
+                        flex: 1;
+                        padding: 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    
+                    .my-post-details {
+                        flex: 1;
+                    }
+                    
+                    .my-post-actions {
+                        display: flex;
+                        align-items: center;
+                        margin-left: 16px;
+                    }
+                    
+                    .btn-edit {
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                        padding: 10px 16px;
+                        background: #f7fafc;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        color: #4a5568;
+                        font-size: 14px;
+                        font-weight: 500;
+                        text-decoration: none;
+                        transition: all 0.2s ease;
+                        cursor: pointer;
+                    }
+                    
+                    .btn-edit:hover {
+                        background: #667eea;
+                        border-color: #667eea;
+                        color: white;
+                    }
+                    
+                    .btn-edit i {
+                        font-size: 14px;
+                    }
+                    
+                    .my-post-title {
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #2d3748;
+                        margin: 0 0 8px 0;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    
+                    .my-post-price {
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: #667eea;
+                        margin: 0 0 12px 0;
+                    }
+                    
+                    .my-post-meta {
+                        display: flex;
+                        gap: 16px;
+                        font-size: 14px;
+                        color: #718096;
+                    }
+                    
+                    .my-post-region,
+                    .my-post-category {
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                    }
+                    
+                    .empty-posts {
+                        text-align: center;
+                        padding: 80px 20px;
+                        color: #718096;
+                        grid-column: 1 / -1;
+                    }
+                    
+                    .empty-posts p {
+                        font-size: 18px;
+                        margin: 0;
+                    }
+                    
+                    .pagination {
+                        display: flex;
+                        justify-content: center;
+                        align-items: center;
+                        gap: 8px;
+                        margin-top: 40px;
+                        padding: 20px 0;
+                    }
+                    
+                    .pagination-btn,
+                    .pagination-number {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 40px;
+                        height: 40px;
+                        padding: 0 12px;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 8px;
+                        background: white;
+                        color: #4a5568;
+                        text-decoration: none;
+                        font-size: 14px;
+                        font-weight: 500;
+                        transition: all 0.2s ease;
+                        cursor: pointer;
+                    }
+                    
+                    .pagination-btn:hover:not(.disabled),
+                    .pagination-number:hover:not(.active) {
+                        background: #f7fafc;
+                        border-color: #667eea;
+                        color: #667eea;
+                    }
+                    
+                    .pagination-number.active {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        border-color: #667eea;
+                        color: white;
+                        font-weight: 600;
+                    }
+                    
+                    .pagination-btn.disabled {
+                        opacity: 0.4;
+                        cursor: not-allowed;
+                        background: #f7fafc;
+                    }
+                    
+                    .pagination-numbers {
+                        display: flex;
+                        gap: 4px;
+                        align-items: center;
+                    }
+                    
+                    .pagination-ellipsis {
+                        padding: 0 8px;
+                        color: #a0aec0;
+                        font-weight: 600;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .my-post-link {
+                            height: 120px;
+                        }
+                        
+                        .my-post-image {
+                            width: 120px;
+                            min-width: 120px;
+                        }
+                        
+                        .my-post-info {
+                            padding: 12px;
+                        }
+                        
+                        .my-post-title {
+                            font-size: 14px;
+                        }
+                        
+                        .my-post-price {
+                            font-size: 16px;
+                        }
+                        
+                        .my-post-meta {
+                            flex-direction: column;
+                            gap: 4px;
+                            font-size: 12px;
+                        }
+                        
+                        .pagination {
+                            gap: 4px;
+                        }
+                        
+                        .pagination-btn,
+                        .pagination-number {
+                            min-width: 36px;
+                            height: 36px;
+                            padding: 0 8px;
+                            font-size: 13px;
+                        }
+                        
+                        .pagination-ellipsis {
+                            padding: 0 4px;
+                        }
+                    }
+                </style>
                 
             <% } else if (currentPage === 'likes') { %>
                 <p class="myshop-content-text">찜한 게시글 목록입니다.</p>
                 
+                <div class="favorite-posts-grid" id="favoritePostsGrid">
+                    <% if (typeof favorites !== 'undefined' && favorites && favorites.length > 0) { %>
+                        <% favorites.forEach(function(favorite) { %>
+                            <div class="favorite-post-card" data-post-id="<%= favorite.postId %>">
+                                <a href="/post/<%= favorite.postId %>" class="favorite-post-link">
+                                    <div class="favorite-post-image">
+                                        <% if (favorite.imageUrl && favorite.imageUrl.trim() !== '') { %>
+                                            <img src="/uploads/temp/<%= favorite.imageUrl %>" alt="<%= favorite.title %>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                            <div class="no-image-placeholder" style="display: none;">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        <% } else { %>
+                                            <div class="no-image-placeholder">
+                                                <i class="fas fa-image"></i>
+                                            </div>
+                                        <% } %>
+                                        <div class="favorite-post-status <%= favorite.status.toLowerCase() %>">
+                                            <%= favorite.status === 'OPEN' ? '판매중' : '판매완료' %>
+                                        </div>
+                                    </div>
+                                    <div class="favorite-post-info">
+                                        <div class="favorite-post-details">
+                                            <h3 class="favorite-post-title"><%= favorite.title %></h3>
+                                            <p class="favorite-post-price"><%= Number(favorite.price).toLocaleString() %>원</p>
+                                            <p class="favorite-post-region">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <%= favorite.region %>
+                                            </p>
+                                        </div>
+                                        <button class="favorite-remove-btn-inline" onclick="removeFavorite('<%= favorite.postId %>', event)">
+                                            <i class="fas fa-heart"></i>
+                                        </button>
+                                    </div>
+                                </a>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="empty-favorites">
+                            <i class="far fa-heart" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                            <p>찜한 게시글이 없습니다.</p>
+                            <a href="/" class="btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 24px; text-decoration: none;">게시글 둘러보기</a>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <style>
+                    .favorite-posts-grid {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                        margin-top: 30px;
+                    }
+                    
+                    .favorite-post-card {
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                        position: relative;
+                    }
+                    
+                    .favorite-post-card:hover {
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .favorite-post-link {
+                        display: flex;
+                        text-decoration: none;
+                        color: inherit;
+                        height: 140px;
+                    }
+                    
+                    .favorite-post-image {
+                        position: relative;
+                        width: 180px;
+                        min-width: 180px;
+                        background: #f7fafc;
+                        overflow: hidden;
+                    }
+                    
+                    .favorite-post-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    
+                    .no-image-placeholder {
+                        width: 100%;
+                        height: 100%;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        background: #edf2f7;
+                        color: #a0aec0;
+                        font-size: 48px;
+                    }
+                    
+                    .favorite-post-status {
+                        position: absolute;
+                        top: 12px;
+                        left: 12px;
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: white;
+                        z-index: 1;
+                    }
+                    
+                    .favorite-post-status.open {
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                    }
+                    
+                    .favorite-post-status.close {
+                        background: #718096;
+                    }
+                    
+                    .favorite-post-info {
+                        flex: 1;
+                        padding: 20px;
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                    }
+                    
+                    .favorite-post-details {
+                        flex: 1;
+                    }
+                    
+                    .favorite-post-title {
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #2d3748;
+                        margin: 0 0 8px 0;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    
+                    .favorite-post-price {
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: #667eea;
+                        margin: 0 0 8px 0;
+                    }
+                    
+                    .favorite-post-region {
+                        font-size: 14px;
+                        color: #718096;
+                        margin: 0;
+                        display: flex;
+                        align-items: center;
+                        gap: 4px;
+                    }
+                    
+                    .favorite-remove-btn-inline {
+                        padding: 10px 16px;
+                        background: #fff5f5;
+                        border: 1px solid #feb2b2;
+                        border-radius: 8px;
+                        color: #f56565;
+                        font-size: 20px;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        min-width: 44px;
+                        height: 44px;
+                    }
+                    
+                    .favorite-remove-btn-inline:hover {
+                        background: #fed7d7;
+                        border-color: #fc8181;
+                    }
+                    
+                    .empty-favorites {
+                        text-align: center;
+                        padding: 80px 20px;
+                        color: #718096;
+                        grid-column: 1 / -1;
+                    }
+                    
+                    .empty-favorites p {
+                        font-size: 18px;
+                        margin: 0;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .favorite-post-link {
+                            height: 120px;
+                        }
+                        
+                        .favorite-post-image {
+                            width: 120px;
+                            min-width: 120px;
+                        }
+                        
+                        .favorite-post-info {
+                            padding: 12px;
+                        }
+                        
+                        .favorite-post-title {
+                            font-size: 14px;
+                        }
+                        
+                        .favorite-post-price {
+                            font-size: 16px;
+                        }
+                        
+                        .favorite-remove-btn-inline {
+                            padding: 8px;
+                            min-width: 36px;
+                            height: 36px;
+                            font-size: 16px;
+                        }
+                    }
+                </style>
+                
+                <script>
+                    function removeFavorite(postId, event) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                        
+                        if (!confirm('찜 목록에서 제거하시겠습니까?')) {
+                            return;
+                        }
+                        
+                        // 해당 카드 요소 찾기
+                        const cardElement = document.querySelector(`.favorite-post-card[data-post-id="${postId}"]`);
+                        
+                        // API 호출
+                        fetch(`/api/favorite/toggle/${postId}`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' }
+                        })
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.success) {
+                                // 성공하면 DOM에서 즉시 제거
+                                if (cardElement) {
+                                    cardElement.style.transition = 'all 0.3s ease';
+                                    cardElement.style.opacity = '0';
+                                    cardElement.style.transform = 'translateX(-20px)';
+                                    
+                                    setTimeout(() => {
+                                        cardElement.remove();
+                                        
+                                        // 모든 카드가 제거되었는지 확인
+                                        const remainingCards = document.querySelectorAll('.favorite-post-card');
+                                        if (remainingCards.length === 0) {
+                                            // 빈 상태 표시
+                                            const gridElement = document.getElementById('favoritePostsGrid');
+                                            if (gridElement) {
+                                                gridElement.innerHTML = `
+                                                    <div class="empty-favorites">
+                                                        <i class="far fa-heart" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                                                        <p>찜한 게시글이 없습니다.</p>
+                                                        <a href="/" class="btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 24px; text-decoration: none;">게시글 둘러보기</a>
+                                                    </div>
+                                                `;
+                                            }
+                                        }
+                                    }, 300);
+                                    
+                                    showToast('찜 목록에서 제거되었습니다.');
+                                }
+                            } else {
+                                alert(data.message || '찜 제거에 실패했습니다.');
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('찜 제거 중 오류가 발생했습니다.');
+                        });
+                    }
+                    
+                    function showToast(message) {
+                        const toast = document.createElement('div');
+                        toast.textContent = message;
+                        toast.style.cssText = `
+                            position: fixed;
+                            bottom: 30px;
+                            left: 50%;
+                            transform: translateX(-50%);
+                            background-color: rgba(0, 0, 0, 0.8);
+                            color: white;
+                            padding: 12px 24px;
+                            border-radius: 8px;
+                            z-index: 9999;
+                            animation: fadeInOut 2s ease-in-out;
+                        `;
+                        
+                        document.body.appendChild(toast);
+                        
+                        setTimeout(() => {
+                            toast.remove();
+                        }, 2000);
+                    }
+                </script>
+                
             <% } else if (currentPage === 'history') { %>
-                <p class="myshop-content-text">거래 내역을 확인할 수 있습니다.</p>
+                <p class="myshop-content-text">구매 및 판매한 거래 내역입니다.</p>
+                
+                <% if (typeof tradeStats !== 'undefined' && tradeStats) { %>
+                    <div class="trade-stats">
+                        <div class="trade-stat-item">
+                            <i class="fas fa-shopping-cart"></i>
+                            <div class="trade-stat-content">
+                                <span class="trade-stat-label">구매</span>
+                                <span class="trade-stat-count"><%= tradeStats.buyCount %></span>
+                            </div>
+                        </div>
+                        <div class="trade-stat-item">
+                            <i class="fas fa-dollar-sign"></i>
+                            <div class="trade-stat-content">
+                                <span class="trade-stat-label">판매</span>
+                                <span class="trade-stat-count"><%= tradeStats.sellCount %></span>
+                            </div>
+                        </div>
+                        <div class="trade-stat-item">
+                            <i class="fas fa-exchange-alt"></i>
+                            <div class="trade-stat-content">
+                                <span class="trade-stat-label">전체</span>
+                                <span class="trade-stat-count"><%= tradeStats.totalCount %></span>
+                            </div>
+                        </div>
+                    </div>
+                <% } %>
+                
+                <div class="trade-history-grid" id="tradeHistoryGrid">
+                    <% if (typeof trades !== 'undefined' && trades && trades.length > 0) { %>
+                        <% trades.forEach(function(trade) { %>
+                            <div class="trade-history-card" data-trade-id="<%= trade.id %>">
+                                <div class="trade-type-badge <%= trade.type %>">
+                                    <%= trade.type === 'buy' ? '구매' : '판매' %>
+                                </div>
+                                <div class="trade-history-content">
+                                    <a href="/post/<%= trade.postId %>" class="trade-history-link">
+                                        <div class="trade-history-image">
+                                            <% if (trade.imageUrl && trade.imageUrl.trim() !== '') { %>
+                                                <img src="/uploads/temp/<%= trade.imageUrl %>" alt="<%= trade.postTitle %>" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                                                <div class="no-image-placeholder" style="display: none;">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            <% } else { %>
+                                                <div class="no-image-placeholder">
+                                                    <i class="fas fa-image"></i>
+                                                </div>
+                                            <% } %>
+                                        </div>
+                                        <div class="trade-history-info">
+                                            <h3 class="trade-history-title"><%= trade.postTitle %></h3>
+                                            <p class="trade-history-price"><%= Number(trade.price).toLocaleString() %>원</p>
+                                            <div class="trade-history-meta">
+                                                <span class="trade-partner">
+                                                    <i class="fas fa-user"></i>
+                                                    <%= trade.type === 'buy' ? '판매자' : '구매자' %>: <%= trade.partnerName %>
+                                                </span>
+                                                <span class="trade-status status-<%= trade.status.toLowerCase() %>">
+                                                    <% 
+                                                        const statusText = {
+                                                            'PENDING': '협의중',
+                                                            'IN_PERSON': '직거래중',
+                                                            'SHIPPING': '배송중',
+                                                            'CANCELED': '취소됨',
+                                                            'COMPLETED': '완료'
+                                                        };
+                                                    %>
+                                                    <%= statusText[trade.status] || trade.status %>
+                                                </span>
+                                            </div>
+                                            <div class="trade-history-date">
+                                                <i class="far fa-calendar-alt"></i>
+                                                <%= new Date(trade.createdAt).toLocaleDateString() %>
+                                            </div>
+                                        </div>
+                                    </a>
+                                    <div class="trade-actions">
+                                        <a href="/chat/<%= trade.id %>" class="chat-room-btn" title="채팅방으로 이동">
+                                            <i class="fas fa-comments"></i>
+                                            채팅하기
+                                        </a>
+                                        <% if (trade.type === 'buy' && trade.status === 'COMPLETED' && trade.tradeRecordId) { %>
+                                            <button class="review-btn" onclick="openReviewModal('<%= trade.tradeRecordId %>', '<%= trade.postId %>', '<%= trade.postTitle %>')" title="리뷰 작성">
+                                                <i class="fas fa-star"></i>
+                                                리뷰 작성
+                                            </button>
+                                        <% } %>
+                                    </div>
+                                </div>
+                            </div>
+                        <% }); %>
+                    <% } else { %>
+                        <div class="empty-trades">
+                            <i class="fas fa-receipt" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                            <p>거래 내역이 없습니다.</p>
+                            <a href="/" class="btn-primary" style="margin-top: 20px; display: inline-block; padding: 12px 24px; text-decoration: none;">상품 둘러보기</a>
+                        </div>
+                    <% } %>
+                </div>
+                
+                <style>
+                    .trade-stats {
+                        display: grid;
+                        grid-template-columns: repeat(3, 1fr);
+                        gap: 20px;
+                        margin-bottom: 30px;
+                    }
+                    
+                    .trade-stat-item {
+                        display: flex;
+                        align-items: center;
+                        gap: 16px;
+                        padding: 20px;
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 12px;
+                        transition: all 0.2s ease;
+                    }
+                    
+                    .trade-stat-item:hover {
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+                        transform: translateY(-2px);
+                    }
+                    
+                    .trade-stat-item i {
+                        font-size: 32px;
+                        color: #667eea;
+                    }
+                    
+                    .trade-stat-content {
+                        display: flex;
+                        flex-direction: column;
+                    }
+                    
+                    .trade-stat-label {
+                        font-size: 14px;
+                        color: #718096;
+                        margin-bottom: 4px;
+                    }
+                    
+                    .trade-stat-count {
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #2d3748;
+                    }
+                    
+                    .trade-history-grid {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                        margin-top: 30px;
+                    }
+                    
+                    .trade-history-card {
+                        position: relative;
+                        background: white;
+                        border: 1px solid #e2e8f0;
+                        border-radius: 12px;
+                        overflow: hidden;
+                        transition: all 0.3s ease;
+                    }
+                    
+                    .trade-history-card:hover {
+                        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+                    }
+                    
+                    .trade-history-content {
+                        display: flex;
+                        position: relative;
+                    }
+                    
+                    .trade-type-badge {
+                        position: absolute;
+                        top: 12px;
+                        left: 12px;
+                        padding: 6px 12px;
+                        border-radius: 6px;
+                        font-size: 12px;
+                        font-weight: 600;
+                        color: white;
+                        z-index: 2;
+                    }
+                    
+                    .trade-type-badge.buy {
+                        background: #48bb78;
+                    }
+                    
+                    .trade-type-badge.sell {
+                        background: #4299e1;
+                    }
+                    
+                    .trade-history-link {
+                        display: flex;
+                        text-decoration: none;
+                        color: inherit;
+                        flex: 1;
+                        height: 140px;
+                    }
+                    
+                    .chat-room-btn {
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 6px;
+                        padding: 20px 24px;
+                        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                        color: white;
+                        text-decoration: none;
+                        font-size: 14px;
+                        font-weight: 600;
+                        border-left: 1px solid #e2e8f0;
+                        transition: all 0.2s ease;
+                        min-width: 100px;
+                    }
+                    
+                    .chat-room-btn:hover {
+                        background: linear-gradient(135deg, #5568d3 0%, #6a4190 100%);
+                        transform: translateY(-2px);
+                    }
+                    
+                    .chat-room-btn i {
+                        font-size: 24px;
+                    }
+                    
+                    .trade-history-image {
+                        position: relative;
+                        width: 180px;
+                        min-width: 180px;
+                        background: #f7fafc;
+                        overflow: hidden;
+                    }
+                    
+                    .trade-history-image img {
+                        width: 100%;
+                        height: 100%;
+                        object-fit: cover;
+                    }
+                    
+                    .trade-history-info {
+                        flex: 1;
+                        padding: 20px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: space-between;
+                    }
+                    
+                    .trade-history-title {
+                        font-size: 18px;
+                        font-weight: 600;
+                        color: #2d3748;
+                        margin: 0 0 8px 0;
+                        overflow: hidden;
+                        text-overflow: ellipsis;
+                        white-space: nowrap;
+                    }
+                    
+                    .trade-history-price {
+                        font-size: 20px;
+                        font-weight: 700;
+                        color: #667eea;
+                        margin: 0 0 12px 0;
+                    }
+                    
+                    .trade-history-meta {
+                        display: flex;
+                        gap: 16px;
+                        align-items: center;
+                        font-size: 14px;
+                        margin-bottom: 8px;
+                    }
+                    
+                    .trade-partner {
+                        color: #718096;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    }
+                    
+                    .trade-status {
+                        padding: 4px 12px;
+                        border-radius: 12px;
+                        font-size: 12px;
+                        font-weight: 600;
+                    }
+                    
+                    .trade-status.status-pending {
+                        background: #fff5e6;
+                        color: #f59e0b;
+                    }
+                    
+                    .trade-status.status-in_person,
+                    .trade-status.status-shipping {
+                        background: #e6f2ff;
+                        color: #3b82f6;
+                    }
+                    
+                    .trade-status.status-completed {
+                        background: #e6f9f0;
+                        color: #10b981;
+                    }
+                    
+                    .trade-status.status-canceled {
+                        background: #fee;
+                        color: #ef4444;
+                    }
+                    
+                    .trade-history-date {
+                        font-size: 13px;
+                        color: #a0aec0;
+                        display: flex;
+                        align-items: center;
+                        gap: 6px;
+                    }
+                    
+                    .empty-trades {
+                        text-align: center;
+                        padding: 80px 20px;
+                        color: #718096;
+                        grid-column: 1 / -1;
+                    }
+                    
+                    .empty-trades p {
+                        font-size: 18px;
+                        margin: 0;
+                    }
+                    
+                    @media (max-width: 768px) {
+                        .trade-stats {
+                            grid-template-columns: 1fr;
+                            gap: 12px;
+                        }
+                        
+                        .trade-stat-item {
+                            padding: 16px;
+                        }
+                        
+                        .trade-stat-item i {
+                            font-size: 24px;
+                        }
+                        
+                        .trade-stat-count {
+                            font-size: 20px;
+                        }
+                        
+                        .trade-history-link {
+                            height: auto;
+                            flex-direction: column;
+                        }
+                        
+                        .trade-history-content {
+                            flex-direction: column;
+                        }
+                        
+                        .trade-history-image {
+                            width: 100%;
+                            min-width: 100%;
+                            height: 200px;
+                        }
+                        
+                        .trade-history-info {
+                            padding: 12px;
+                        }
+                        
+                        .trade-history-title {
+                            font-size: 14px;
+                        }
+                        
+                        .trade-history-price {
+                            font-size: 16px;
+                        }
+                        
+                        .trade-history-meta {
+                            flex-direction: column;
+                            align-items: flex-start;
+                            gap: 8px;
+                        }
+                        
+                        .chat-room-btn {
+                            flex-direction: row;
+                            justify-content: center;
+                            padding: 16px;
+                            border-left: none;
+                            border-top: 1px solid #e2e8f0;
+                            min-width: auto;
+                            width: 100%;
+                        }
+                        
+                        .chat-room-btn i {
+                            font-size: 18px;
+                        }
+                    }
+                    
+                    .trade-actions {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 8px;
+                        border-left: 1px solid #e2e8f0;
+                        min-width: 120px;
+                    }
+                    
+                    .review-btn {
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        gap: 8px;
+                        padding: 12px 16px;
+                        background: #fef3c7;
+                        border: 1px solid #fbbf24;
+                        border-radius: 0;
+                        color: #92400e;
+                        font-size: 14px;
+                        font-weight: 600;
+                        cursor: pointer;
+                        transition: all 0.2s ease;
+                        text-decoration: none;
+                    }
+                    
+                    .review-btn:hover {
+                        background: #fde68a;
+                    }
+                    
+                    .review-btn i {
+                        font-size: 14px;
+                    }
+                </style>
                 
             <% } else if (currentPage === 'reviews') { %>
-                <p class="myshop-content-text">받은 리뷰 내역입니다.</p>
+                <h2 class="myshop-section-title">받은 리뷰 <%= reviewStats.totalCount > 0 ? `(${reviewStats.totalCount})` : '' %></h2>
+                
+                <% if (reviewStats.totalCount > 0) { %>
+                    <div class="review-stats-summary">
+                        <div class="avg-rating-box">
+                            <i class="fas fa-star" style="color: #fbbf24;"></i>
+                            <span class="rating-value"><%= reviewStats.avgRating %></span>
+                            <span class="rating-label">/ 5.0</span>
+                        </div>
+                    </div>
+                    
+                    <div class="reviews-container">
+                        <% reviews.forEach(function(review) { %>
+                            <div class="review-item-card">
+                                <div class="review-item-header">
+                                    <div class="review-author-info">
+                                        <i class="fas fa-user-circle" style="font-size: 20px; color: #667eea;"></i>
+                                        <span class="author-name"><%= review.buyerName %></span>
+                                    </div>
+                                    <div class="review-rating-stars">
+                                        <% for(let i = 1; i <= 5; i++) { %>
+                                            <i class="<%= i <= review.rating ? 'fas' : 'far' %> fa-star" style="color: #fbbf24;"></i>
+                                        <% } %>
+                                    </div>
+                                </div>
+                                <div class="review-post-info">
+                                    <i class="fas fa-box" style="color: #94a3b8;"></i>
+                                    <a href="/post/<%= review.postId %>" style="color: #667eea; text-decoration: none;">
+                                        <%= review.postTitle %>
+                                    </a>
+                                </div>
+                                <div class="review-item-content">
+                                    <%= review.content || '작성된 내용이 없습니다.' %>
+                                </div>
+                                <div class="review-item-date">
+                                    <%= new Date(review.createdAt).toLocaleDateString('ko-KR') %>
+                                </div>
+                            </div>
+                        <% }); %>
+                    </div>
+                    
+                    <!-- 페이지네이션 -->
+                    <% if (pagination.totalPages > 1) { %>
+                        <div class="pagination">
+                            <% if (pagination.currentPage > 1) { %>
+                                <a href="/myshop/reviews?page=<%= pagination.currentPage - 1 %>" class="pagination-btn">
+                                    <i class="fas fa-chevron-left"></i>
+                                </a>
+                            <% } else { %>
+                                <span class="pagination-btn disabled">
+                                    <i class="fas fa-chevron-left"></i>
+                                </span>
+                            <% } %>
+                            
+                            <div class="pagination-numbers">
+                                <% 
+                                    const startPage = Math.max(1, pagination.currentPage - 2);
+                                    const endPage = Math.min(pagination.totalPages, pagination.currentPage + 2);
+                                    for (let i = startPage; i <= endPage; i++) {
+                                %>
+                                    <a href="/myshop/reviews?page=<%= i %>" 
+                                       class="pagination-number <%= i === pagination.currentPage ? 'active' : '' %>">
+                                        <%= i %>
+                                    </a>
+                                <% } %>
+                            </div>
+                            
+                            <% if (pagination.currentPage < pagination.totalPages) { %>
+                                <a href="/myshop/reviews?page=<%= pagination.currentPage + 1 %>" class="pagination-btn">
+                                    <i class="fas fa-chevron-right"></i>
+                                </a>
+                            <% } else { %>
+                                <span class="pagination-btn disabled">
+                                    <i class="fas fa-chevron-right"></i>
+                                </span>
+                            <% } %>
+                        </div>
+                    <% } %>
+                <% } else { %>
+                    <div class="empty-state">
+                        <i class="far fa-star" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                        <p>아직 받은 리뷰가 없습니다.</p>
+                    </div>
+                <% } %>
+                
+                <style>
+                    .review-stats-summary {
+                        background: white;
+                        border-radius: 12px;
+                        padding: 24px;
+                        margin-bottom: 24px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    }
+                    
+                    .avg-rating-box {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        font-size: 24px;
+                        font-weight: 700;
+                    }
+                    
+                    .rating-value {
+                        color: #1e293b;
+                    }
+                    
+                    .rating-label {
+                        font-size: 16px;
+                        color: #94a3b8;
+                        font-weight: 400;
+                    }
+                    
+                    .reviews-container {
+                        display: flex;
+                        flex-direction: column;
+                        gap: 16px;
+                    }
+                    
+                    .review-item-card {
+                        background: white;
+                        border-radius: 12px;
+                        padding: 20px;
+                        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                    }
+                    
+                    .review-item-header {
+                        display: flex;
+                        justify-content: space-between;
+                        align-items: center;
+                        margin-bottom: 12px;
+                    }
+                    
+                    .review-author-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                    }
+                    
+                    .author-name {
+                        font-weight: 600;
+                        color: #1e293b;
+                    }
+                    
+                    .review-rating-stars {
+                        display: flex;
+                        gap: 4px;
+                    }
+                    
+                    .review-post-info {
+                        display: flex;
+                        align-items: center;
+                        gap: 8px;
+                        margin-bottom: 12px;
+                        font-size: 14px;
+                        color: #64748b;
+                    }
+                    
+                    .review-item-content {
+                        color: #475569;
+                        line-height: 1.6;
+                        margin-bottom: 12px;
+                        padding: 12px;
+                        background: #f8fafc;
+                        border-radius: 8px;
+                    }
+                    
+                    .review-item-date {
+                        font-size: 13px;
+                        color: #94a3b8;
+                        text-align: right;
+                    }
+                </style>
                 
             <% } else { %>
                 <p class="myshop-content-text">좌측 메뉴에서 항목을 선택해주세요.</p>
@@ -143,3 +1584,284 @@
         </section>
     </div>
 </div>
+
+<!-- 리뷰 작성 모달 -->
+<div id="reviewModal" class="review-modal">
+    <div class="review-modal-content">
+        <div class="review-modal-header">
+            <h2>리뷰 작성</h2>
+            <button class="review-modal-close" onclick="closeReviewModal()">&times;</button>
+        </div>
+        <div class="review-modal-body">
+            <form id="reviewForm">
+                <input type="hidden" id="reviewTradeRecordId">
+                <input type="hidden" id="reviewPostId">
+                <input type="hidden" id="reviewRating" value="0">
+                
+                <div class="review-product">
+                    <strong>상품:</strong> <span id="reviewPostTitle"></span>
+                </div>
+                
+                <div class="review-rating-section">
+                    <label>별점</label>
+                    <div class="star-rating">
+                        <i class="far fa-star" onclick="setRating(1)"></i>
+                        <i class="far fa-star" onclick="setRating(2)"></i>
+                        <i class="far fa-star" onclick="setRating(3)"></i>
+                        <i class="far fa-star" onclick="setRating(4)"></i>
+                        <i class="far fa-star" onclick="setRating(5)"></i>
+                    </div>
+                </div>
+                
+                <div class="review-content-section">
+                    <label for="reviewContent">리뷰 내용</label>
+                    <textarea id="reviewContent" rows="5" placeholder="거래 경험을 공유해주세요"></textarea>
+                </div>
+                
+                <div class="review-modal-actions">
+                    <button type="button" class="btn-cancel" onclick="closeReviewModal()">취소</button>
+                    <button type="submit" class="btn-submit">작성하기</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    .review-modal {
+        display: none;
+        position: fixed;
+        z-index: 1000;
+        left: 0;
+        top: 0;
+        width: 100%;
+        height: 100%;
+        background-color: rgba(0, 0, 0, 0.5);
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .review-modal-content {
+        background: white;
+        border-radius: 16px;
+        width: 90%;
+        max-width: 500px;
+        max-height: 90vh;
+        overflow-y: auto;
+    }
+    
+    .review-modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 20px;
+        border-bottom: 1px solid #e2e8f0;
+    }
+    
+    .review-modal-header h2 {
+        margin: 0;
+        font-size: 20px;
+        color: #2d3748;
+    }
+    
+    .review-modal-close {
+        background: none;
+        border: none;
+        font-size: 28px;
+        color: #718096;
+        cursor: pointer;
+        padding: 0;
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .review-modal-close:hover {
+        color: #2d3748;
+    }
+    
+    .review-modal-body {
+        padding: 20px;
+    }
+    
+    .review-product {
+        padding: 12px;
+        background: #f7fafc;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        font-size: 14px;
+        color: #4a5568;
+    }
+    
+    .review-rating-section {
+        margin-bottom: 20px;
+    }
+    
+    .review-rating-section label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+    
+    .star-rating {
+        display: flex;
+        gap: 8px;
+    }
+    
+    .star-rating i {
+        font-size: 32px;
+        color: #fbbf24;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .star-rating i:hover {
+        transform: scale(1.2);
+    }
+    
+    .review-content-section {
+        margin-bottom: 20px;
+    }
+    
+    .review-content-section label {
+        display: block;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+        margin-bottom: 8px;
+    }
+    
+    .review-content-section textarea {
+        width: 100%;
+        padding: 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        font-size: 14px;
+        resize: vertical;
+        font-family: inherit;
+    }
+    
+    .review-content-section textarea:focus {
+        outline: none;
+        border-color: #667eea;
+    }
+    
+    .review-modal-actions {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+    
+    .btn-cancel,
+    .btn-submit {
+        padding: 10px 20px;
+        border-radius: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        border: none;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-cancel {
+        background: #f7fafc;
+        color: #4a5568;
+    }
+    
+    .btn-cancel:hover {
+        background: #edf2f7;
+    }
+    
+    .btn-submit {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+    }
+    
+    .btn-submit:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+    }
+</style>
+
+<script>
+    function openReviewModal(tradeRecordId, postId, postTitle) {
+        const modal = document.getElementById('reviewModal');
+        document.getElementById('reviewTradeRecordId').value = tradeRecordId;
+        document.getElementById('reviewPostId').value = postId;
+        document.getElementById('reviewPostTitle').textContent = postTitle;
+        modal.style.display = 'flex';
+    }
+    
+    function closeReviewModal() {
+        const modal = document.getElementById('reviewModal');
+        modal.style.display = 'none';
+        document.getElementById('reviewForm').reset();
+        document.querySelectorAll('.star-rating i').forEach(star => {
+            star.classList.remove('fas');
+            star.classList.add('far');
+        });
+    }
+    
+    function setRating(rating) {
+        document.getElementById('reviewRating').value = rating;
+        const stars = document.querySelectorAll('.star-rating i');
+        stars.forEach((star, index) => {
+            if (index < rating) {
+                star.classList.remove('far');
+                star.classList.add('fas');
+            } else {
+                star.classList.remove('fas');
+                star.classList.add('far');
+            }
+        });
+    }
+    
+    // DOM 로드 후 이벤트 리스너 등록
+    document.addEventListener('DOMContentLoaded', function() {
+        const reviewForm = document.getElementById('reviewForm');
+        if (reviewForm) {
+            reviewForm.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                
+                const formData = {
+                    trade_record_id: parseInt(document.getElementById('reviewTradeRecordId').value),
+                    post_id: parseInt(document.getElementById('reviewPostId').value),
+                    rating: parseInt(document.getElementById('reviewRating').value),
+                    content: document.getElementById('reviewContent').value
+                };
+                
+                if (!formData.rating) {
+                    alert('별점을 선택해주세요.');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/review', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(formData)
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        alert('리뷰가 작성되었습니다.');
+                        closeReviewModal();
+                        window.location.reload();
+                    } else {
+                        alert(data.message || '리뷰 작성에 실패했습니다.');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    alert('리뷰 작성 중 오류가 발생했습니다.');
+                }
+            });
+        }
+    });
+</script>

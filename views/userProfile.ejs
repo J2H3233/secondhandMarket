@@ -1,0 +1,712 @@
+<% 
+    title = title || '사용자 프로필 - 중고마켓';
+    additionalCSS = ['/css/myshop.css'];
+%>
+
+<main class="user-profile-container">
+    <!-- 사용자 정보 헤더 -->
+    <div class="profile-header">
+        <div class="profile-header-content">
+            <div class="profile-avatar">
+                <i class="fas fa-user-circle"></i>
+            </div>
+            <div class="profile-info">
+                <h1 class="profile-username"><%= profileUser.username %></h1>
+                <p class="profile-region">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <%= profileUser.region %>
+                </p>
+            </div>
+        </div>
+        
+        <!-- 거래 통계 -->
+        <div class="profile-stats">
+            <div class="profile-stat-item">
+                <i class="fas fa-box"></i>
+                <div class="profile-stat-content">
+                    <span class="profile-stat-label">작성한 게시글</span>
+                    <span class="profile-stat-count"><%= pagination.totalCount %></span>
+                </div>
+            </div>
+            <div class="profile-stat-item">
+                <i class="fas fa-shopping-cart"></i>
+                <div class="profile-stat-content">
+                    <span class="profile-stat-label">구매</span>
+                    <span class="profile-stat-count"><%= tradeStats.buyCount %></span>
+                </div>
+            </div>
+            <div class="profile-stat-item">
+                <i class="fas fa-dollar-sign"></i>
+                <div class="profile-stat-content">
+                    <span class="profile-stat-label">판매</span>
+                    <span class="profile-stat-count"><%= tradeStats.sellCount %></span>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 게시글 목록과 리뷰 좌우 배치 -->
+    <div class="profile-content-wrapper">
+        <!-- 게시글 목록 (왼쪽) -->
+        <div class="profile-posts-section">
+            <h2 class="section-title">작성한 게시글</h2>
+            
+            <div class="profile-posts-grid">
+                <% if (posts && posts.length > 0) { %>
+                <% posts.forEach(function(post) { %>
+                    <div class="profile-post-card">
+                        <a href="/post/<%= post.id %>" class="profile-post-link">
+                            <div class="profile-post-image">
+                                <% if (post.imageUrl) { %>
+                                    <img src="/uploads/temp/<%= post.imageUrl %>" alt="<%= post.title %>">
+                                <% } else { %>
+                                    <div class="no-image-placeholder">
+                                        <i class="fas fa-image"></i>
+                                    </div>
+                                <% } %>
+                                <div class="profile-post-status <%= post.status.toLowerCase() %>">
+                                    <%= post.status === 'OPEN' ? '판매중' : '판매완료' %>
+                                </div>
+                            </div>
+                            <div class="profile-post-info">
+                                <h3 class="profile-post-title"><%= post.title %></h3>
+                                <p class="profile-post-price"><%= Number(post.price).toLocaleString() %>원</p>
+                                <div class="profile-post-meta">
+                                    <span class="profile-post-region">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <%= post.region %>
+                                    </span>
+                                    <span class="profile-post-category">
+                                        <i class="fas fa-tag"></i>
+                                        <%= post.category %>
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                    </div>
+                <% }); %>
+            <% } else { %>
+                <div class="empty-posts">
+                    <i class="far fa-file-alt" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                    <p>작성한 게시글이 없습니다.</p>
+                </div>
+            <% } %>
+        </div>
+        
+        <!-- 페이지네이션 -->
+        <% if (pagination.totalPages > 1) { %>
+            <div class="pagination">
+                <% if (pagination.currentPage > 1) { %>
+                    <a href="/user/<%= profileUser.id %>?page=<%= pagination.currentPage - 1 %>" class="pagination-btn">
+                        <i class="fas fa-chevron-left"></i>
+                    </a>
+                <% } else { %>
+                    <span class="pagination-btn disabled">
+                        <i class="fas fa-chevron-left"></i>
+                    </span>
+                <% } %>
+                
+                <div class="pagination-numbers">
+                    <% if (pagination.currentPage > 2) { %>
+                        <a href="/user/<%= profileUser.id %>?page=1" class="pagination-number">1</a>
+                        <% if (pagination.currentPage > 3) { %>
+                            <span class="pagination-ellipsis">...</span>
+                        <% } %>
+                    <% } %>
+                    
+                    <% 
+                        const startPage = Math.max(1, pagination.currentPage - 1);
+                        const endPage = Math.min(pagination.totalPages, pagination.currentPage + 1);
+                        for (let i = startPage; i <= endPage; i++) {
+                    %>
+                        <a href="/user/<%= profileUser.id %>?page=<%= i %>" 
+                           class="pagination-number <%= i === pagination.currentPage ? 'active' : '' %>">
+                            <%= i %>
+                        </a>
+                    <% } %>
+                    
+                    <% if (pagination.currentPage < pagination.totalPages - 1) { %>
+                        <% if (pagination.currentPage < pagination.totalPages - 2) { %>
+                            <span class="pagination-ellipsis">...</span>
+                        <% } %>
+                        <a href="/user/<%= profileUser.id %>?page=<%= pagination.totalPages %>" class="pagination-number">
+                            <%= pagination.totalPages %>
+                        </a>
+                    <% } %>
+                </div>
+                
+                <% if (pagination.currentPage < pagination.totalPages) { %>
+                    <a href="/user/<%= profileUser.id %>?page=<%= pagination.currentPage + 1 %>" class="pagination-btn">
+                        <i class="fas fa-chevron-right"></i>
+                    </a>
+                <% } else { %>
+                    <span class="pagination-btn disabled">
+                        <i class="fas fa-chevron-right"></i>
+                    </span>
+                <% } %>
+            </div>
+        <% } %>
+    </div>
+    
+    <!-- 리뷰 섹션 (오른쪽) -->
+    <div class="profile-reviews-section">
+        <h2 class="section-title">받은 리뷰 <%= reviewStats.totalCount > 0 ? `(${reviewStats.totalCount})` : '' %></h2>
+        
+        <% if (reviewStats.totalCount > 0) { %>
+            <div class="review-stats">
+                <div class="avg-rating">
+                    <i class="fas fa-star"></i>
+                    <span class="rating-value"><%= reviewStats.avgRating %></span>
+                    <span class="rating-label">/ 5.0</span>
+                </div>
+            </div>
+            
+            <div class="reviews-list">
+                <% reviews.forEach(function(review) { %>
+                    <div class="review-card">
+                        <div class="review-header">
+                            <div class="review-author">
+                                <i class="fas fa-user-circle"></i>
+                                <span><%= review.buyerName %></span>
+                            </div>
+                            <div class="review-rating">
+                                <% for(let i = 1; i <= 5; i++) { %>
+                                    <i class="<%= i <= review.rating ? 'fas' : 'far' %> fa-star"></i>
+                                <% } %>
+                            </div>
+                        </div>
+                        <div class="review-post-info">
+                            <i class="fas fa-box"></i>
+                            <a href="/post/<%= review.postId %>"><%= review.postTitle %></a>
+                        </div>
+                        <div class="review-content">
+                            <%= review.content || '작성된 내용이 없습니다.' %>
+                        </div>
+                        <div class="review-date">
+                            <%= new Date(review.createdAt).toLocaleDateString('ko-KR') %>
+                        </div>
+                    </div>
+                <% }); %>
+            </div>
+        <% } else { %>
+            <div class="empty-reviews">
+                <i class="far fa-star" style="font-size: 64px; color: #cbd5e0; margin-bottom: 20px;"></i>
+                <p>아직 받은 리뷰가 없습니다.</p>
+            </div>
+        <% } %>
+    </div>
+</div>
+</main>
+
+<style>
+    .user-profile-container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    .profile-header {
+        background: white;
+        border-radius: 16px;
+        padding: 40px;
+        margin-bottom: 40px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .profile-header-content {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        margin-bottom: 30px;
+    }
+    
+    .profile-avatar {
+        font-size: 80px;
+        color: #667eea;
+        width: 100px;
+        height: 100px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 50%;
+    }
+    
+    .profile-info {
+        flex: 1;
+    }
+    
+    .profile-username {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0 0 12px 0;
+    }
+    
+    .profile-region {
+        font-size: 16px;
+        color: #718096;
+        margin: 0;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    
+    .profile-stats {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+    }
+    
+    .profile-content-wrapper {
+        display: grid;
+        grid-template-columns: 2fr 1fr;
+        gap: 40px;
+        align-items: start;
+    }
+    
+    .profile-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 20px;
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 12px;
+        transition: transform 0.2s ease;
+    }
+    
+    .profile-stat-item:hover {
+        transform: translateY(-2px);
+    }
+    
+    .profile-stat-item i {
+        font-size: 32px;
+        color: #667eea;
+    }
+    
+    .profile-stat-content {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .profile-stat-label {
+        font-size: 14px;
+        color: #718096;
+        font-weight: 500;
+    }
+    
+    .profile-stat-count {
+        font-size: 28px;
+        font-weight: 700;
+        color: #2d3748;
+    }
+    
+    .profile-posts-section,
+    .profile-reviews-section {
+        background: white;
+        border-radius: 16px;
+        padding: 30px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        height: 1050px;
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .section-title {
+        font-size: 24px;
+        font-weight: 700;
+        color: #2d3748;
+        margin: 0 0 30px 0;
+        padding-bottom: 16px;
+        border-bottom: 2px solid #e2e8f0;
+    }
+    
+    .profile-posts-grid {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        flex: 1;
+        min-height: 0;
+    }
+    
+    .profile-post-card {
+        background: white;
+        border: 1px solid #e2e8f0;
+        border-radius: 12px;
+        overflow: hidden;
+        transition: all 0.3s ease;
+        flex-shrink: 0;
+    }
+    
+    .profile-post-card:hover {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transform: translateY(-2px);
+    }
+    
+    .profile-post-link {
+        display: flex;
+        text-decoration: none;
+        color: inherit;
+        height: 140px;
+    }
+    
+    .profile-post-image {
+        position: relative;
+        width: 180px;
+        min-width: 180px;
+        background: #f7fafc;
+        overflow: hidden;
+    }
+    
+    .profile-post-image img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+    
+    .no-image-placeholder {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: #edf2f7;
+        color: #a0aec0;
+        font-size: 48px;
+    }
+    
+    .profile-post-status {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        padding: 6px 12px;
+        border-radius: 6px;
+        font-size: 12px;
+        font-weight: 600;
+        color: white;
+        z-index: 1;
+    }
+    
+    .profile-post-status.open {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    }
+    
+    .profile-post-status.close {
+        background: #718096;
+    }
+    
+    .profile-post-info {
+        flex: 1;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        min-width: 0;
+    }
+    
+    .profile-post-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #2d3748;
+        margin: 0 0 8px 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+    
+    .profile-post-price {
+        font-size: 20px;
+        font-weight: 700;
+        color: #667eea;
+        margin: 0 0 12px 0;
+    }
+    
+    .profile-post-meta {
+        display: flex;
+        gap: 16px;
+        font-size: 14px;
+        color: #718096;
+    }
+    
+    .profile-post-region,
+    .profile-post-category {
+        display: flex;
+        align-items: center;
+        gap: 4px;
+    }
+    
+    .empty-posts,
+    .empty-reviews {
+        text-align: center;
+        padding: 80px 20px;
+        color: #718096;
+    }
+    
+    .empty-posts p,
+    .empty-reviews p {
+        font-size: 18px;
+        margin: 0;
+    }
+    
+    .review-stats {
+        background: linear-gradient(135deg, #667eea15 0%, #764ba215 100%);
+        border-radius: 12px;
+        padding: 20px;
+        text-align: center;
+        margin-bottom: 20px;
+    }
+    
+    .avg-rating {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+    }
+    
+    .avg-rating i {
+        font-size: 24px;
+        color: #fbbf24;
+    }
+    
+    .rating-value {
+        font-size: 32px;
+        font-weight: 700;
+        color: #2d3748;
+    }
+    
+    .rating-label {
+        font-size: 18px;
+        color: #718096;
+    }
+    
+    .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+    }
+    
+    .review-card {
+        background: #f7fafc;
+        border-radius: 12px;
+        padding: 16px;
+        transition: all 0.2s ease;
+    }
+    
+    .review-card:hover {
+        background: #edf2f7;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 12px;
+    }
+    
+    .review-author {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 14px;
+        font-weight: 600;
+        color: #2d3748;
+    }
+    
+    .review-author i {
+        font-size: 20px;
+        color: #667eea;
+    }
+    
+    .review-rating {
+        display: flex;
+        gap: 2px;
+    }
+    
+    .review-rating i {
+        font-size: 14px;
+        color: #fbbf24;
+    }
+    
+    .review-post-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 8px;
+        font-size: 13px;
+        color: #64748b;
+    }
+    
+    .review-post-info i {
+        color: #94a3b8;
+    }
+    
+    .review-post-info a {
+        color: #667eea;
+        text-decoration: none;
+        font-weight: 500;
+    }
+    
+    .review-post-info a:hover {
+        text-decoration: underline;
+    }
+    
+    .review-content {
+        font-size: 14px;
+        color: #4a5568;
+        line-height: 1.6;
+        margin-bottom: 8px;
+    }
+    
+    .review-date {
+        font-size: 12px;
+        color: #a0aec0;
+    }
+    
+    .pagination {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        margin-top: 40px;
+        padding: 20px 0;
+    }
+    
+    .pagination-btn,
+    .pagination-number {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 40px;
+        height: 40px;
+        padding: 0 12px;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        background: white;
+        color: #4a5568;
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .pagination-btn:hover:not(.disabled),
+    .pagination-number:hover:not(.active) {
+        background: #f7fafc;
+        border-color: #667eea;
+        color: #667eea;
+    }
+    
+    .pagination-number.active {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-color: #667eea;
+        color: white;
+        font-weight: 600;
+    }
+    
+    .pagination-btn.disabled {
+        opacity: 0.4;
+        cursor: not-allowed;
+        background: #f7fafc;
+    }
+    
+    .pagination-numbers {
+        display: flex;
+        gap: 4px;
+        align-items: center;
+    }
+    
+    .pagination-ellipsis {
+        padding: 0 8px;
+        color: #a0aec0;
+        font-weight: 600;
+    }
+    
+    @media (max-width: 768px) {
+        .user-profile-container {
+            padding: 20px 10px;
+        }
+        
+        .profile-content-wrapper {
+            grid-template-columns: 1fr;
+            gap: 20px;
+        }
+        
+        .profile-header {
+            padding: 24px 20px;
+        }
+        
+        .profile-header-content {
+            flex-direction: column;
+            text-align: center;
+        }
+        
+        .profile-avatar {
+            font-size: 60px;
+            width: 80px;
+            height: 80px;
+        }
+        
+        .profile-username {
+            font-size: 24px;
+        }
+        
+        .profile-region {
+            justify-content: center;
+        }
+        
+        .profile-stats {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .profile-stat-item {
+            padding: 16px;
+        }
+        
+        .profile-stat-item i {
+            font-size: 24px;
+        }
+        
+        .profile-stat-count {
+            font-size: 20px;
+        }
+        
+        .profile-posts-section,
+        .profile-reviews-section {
+            padding: 24px 16px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+        }
+        
+        .profile-post-link {
+            height: 120px;
+        }
+        
+        .profile-post-image {
+            width: 120px;
+            min-width: 120px;
+        }
+        
+        .profile-post-info {
+            padding: 12px;
+        }
+        
+        .profile-post-title {
+            font-size: 14px;
+        }
+        
+        .profile-post-price {
+            font-size: 16px;
+        }
+        
+        .profile-post-meta {
+            flex-direction: column;
+            gap: 4px;
+            font-size: 12px;
+        }
+    }
+</style>
