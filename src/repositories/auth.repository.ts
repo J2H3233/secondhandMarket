@@ -33,8 +33,8 @@ export const createUserLocalAccount = async (email: string, passwordHash: string
 export const createUser = async (username: string, phone_num: string, region_id: number, address_detail?: string, client: DBClient = prisma) => {
     try {
         const userData: any = {
-            username: 'test2',
-            phone_num: '0101111234',
+            username: username,
+            phone_num: phone_num,
             region: {
                 connect: { id: region_id }
             }

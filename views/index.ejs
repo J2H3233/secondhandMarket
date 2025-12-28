@@ -57,9 +57,9 @@
             <div class="product-card">
               <div class="product-image">
                 <% if (post.images && Array.isArray(post.images) && post.images.length > 0 && post.images[0]) { %>
-                  <img src="<%= post.images[0] %>" alt="<%= post.title %>" onerror="this.src='https://via.placeholder.com/250x200/f8f9fa/6c757d?text=No+Image'">
+                  <img src="<%= post.images[0] %>" alt="<%= post.title %>" onerror="this.onerror=null; this.src='https://placehold.co/250x200/e9ecef/6c757d?text=No+Image';">
                 <% } else { %>
-                  <img src="https://via.placeholder.com/250x200/f8f9fa/6c757d?text=No+Image" alt="<%= post.title %>">
+                  <img src="https://placehold.co/250x200/e9ecef/6c757d?text=No+Image" alt="<%= post.title %>">
                 <% } %>
                 <div class="product-status <%= post.status === 'CLOSE' ? 'sold' : '' %>">
                   <%= post.status === 'CLOSE' ? '판매완료' : '판매중' %>

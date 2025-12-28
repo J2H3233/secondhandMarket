@@ -665,9 +665,9 @@
                             <div class="room-item" data-room-id="<%= room.id %>" data-post-id="<%= room.postId %>" data-post-title="<%= room.postTitle || '상품명 없음' %>" data-other-user="<%= room.otherUserName %>" data-status="<%= room.status %>">
                                 <div class="room-thumbnail">
                                     <% if (room.postImageUrl && room.postImageUrl.trim() !== '') { %>
-                                        <img src="/uploads/temp/<%= room.postImageUrl %>" alt="상품 이미지" onerror="this.src='https://via.placeholder.com/50x50/f8f9fa/6c757d?text=No+Image'">
+                                        <img src="/uploads/temp/<%= room.postImageUrl %>" alt="상품 이미지" onerror="this.onerror=null; this.src='https://placehold.co/50x50/e9ecef/6c757d?text=No+Image';">
                                     <% } else { %>
-                                        <img src="https://via.placeholder.com/50x50/f8f9fa/6c757d?text=No+Image" alt="이미지 없음">
+                                        <img src="https://placehold.co/50x50/e9ecef/6c757d?text=No+Image" alt="이미지 없음">
                                     <% } %>
                                 </div>
                                 <div class="room-info">
@@ -1481,10 +1481,7 @@
                         
                         <div class="modal-form-group">
                             <label for="modal-region-code">📍 ${locationLabel} 지역</label>
-                            <input type="text" id="modal-region-code" placeholder="예: 서울특별시 성북구 삼선동 또는 1129010700" required>
-                            <small style="color: #718096; font-size: 12px; margin-top: 4px; display: block;">
-                                주소 또는 10자리 지역코드를 입력하세요
-                            </small>
+                            <input type="text" id="modal-region-code" placeholder="예: 서울특별시 성북구 삼선동" required>
                         </div>
                         
                         <div class="modal-form-group">

@@ -206,7 +206,7 @@ async function contactSeller() {
       const tradeId = data.data.id;
       location.href = '/chat/' + tradeId;
     } else {
-      alert(result.message || '채팅방 생성에 실패했습니다.');
+      alert(data.message || '채팅방 생성에 실패했습니다.');
     }
   } catch (error) {
     console.error('Chat room creation error:', error);

@@ -12,7 +12,8 @@ export const findTradesByBuyerId = async (
     try {
         return await client.trade.findMany({
             where: {
-                buyer_id: userId
+                buyer_id: userId,
+                status: 'COMPLETED'
             },
             include: {
                 post: {
@@ -64,7 +65,8 @@ export const findTradesBySellerId = async (
     try {
         return await client.trade.findMany({
             where: {
-                seller_id: userId
+                seller_id: userId,
+                status: 'COMPLETED'
             },
             include: {
                 post: {
@@ -114,7 +116,8 @@ export const countTradesByBuyerId = async (
     try {
         return await client.trade.count({
             where: {
-                buyer_id: userId
+                buyer_id: userId,
+                status: 'COMPLETED'
             }
         });
     } catch (error) {
@@ -131,7 +134,8 @@ export const countTradesBySellerId = async (
     try {
         return await client.trade.count({
             where: {
-                seller_id: userId
+                seller_id: userId,
+                status: 'COMPLETED'
             }
         });
     } catch (error) {
