@@ -1,209 +1,300 @@
-<!-- 검색 및 필터 섹션 -->
-<section class="search-section">
+<!-- 검색 및 필터 섹션 --><section class="search-section">
   <div class="search-container">
     <form class="search-form" method="get" action="/search">
       <div class="search-input-group">
         <i class="fas fa-search search-icon"></i>
-        <input type="text" name="query" placeholder="어떤 상품을 찾고 계세요?" class="search-input">
+        <input type="text" name="query" placeholder="어떤 상품을 찾고 계세요?" class="search-input" value="<%= typeof searchQuery !== 'undefined' ? searchQuery : '' %>">
         <button type="submit" class="search-btn">검색</button>
       </div>
     </form>
-    
-    <!-- <div class="filter-options">
-      <select name="region" class="filter-select">
-        <option value="">전체 지역</option>
-        <option value="서울">서울</option>
-        <option value="경기">경기</option>
-        <option value="인천">인천</option>
-        <option value="부산">부산</option>
-        <option value="대구">대구</option>
-      </select>
-      
-      <select name="price" class="filter-select">
-        <option value="">가격대</option>
-        <option value="0-10000">1만원 이하</option>
-        <option value="10000-50000">1만원-5만원</option>
-        <option value="50000-100000">5만원-10만원</option>
-        <option value="100000-">10만원 이상</option>
-      </select>
-    </div> -->
   </div>
 </section>
 
-<!-- 카테고리 섹션 -->
 <section class="category-section">
   <div class="category-container">
     <h2 class="section-title">카테고리</h2>
-    <div class="category-grid">
-      <a href="/category/electronics" class="category-item">
-        <i class="fas fa-mobile-alt"></i>
-        <span>전자기기</span>
+    <div class="category-filter-wrapper">
+      <a href="/" class="category-filter-item <%= !selectedCategory ? 'active' : '' %>">
+        <i class="fas fa-th"></i>
+        <span>전체</span>
       </a>
-      <a href="/category/fashion" class="category-item">
-        <i class="fas fa-tshirt"></i>
-        <span>의류/패션</span>
-      </a>
-      <a href="/category/books" class="category-item">
-        <i class="fas fa-book"></i>
-        <span>도서/문구</span>
-      </a>
-      <a href="/category/home" class="category-item">
-        <i class="fas fa-home"></i>
-        <span>생활용품</span>
-      </a>
-      <a href="/category/sports" class="category-item">
-        <i class="fas fa-dumbbell"></i>
-        <span>스포츠</span>
-      </a>
-      <a href="/category/beauty" class="category-item">
-        <i class="fas fa-spa"></i>
-        <span>미용</span>
-      </a>
-      <a href="/category/food" class="category-item">
-        <i class="fas fa-utensils"></i>
-        <span>식품</span>
-      </a>
-      <a href="/category/others" class="category-item">
-        <i class="fas fa-ellipsis-h"></i>
-        <span>기타</span>
-      </a>
+      <% if (typeof categories !== 'undefined' && categories && categories.length > 0) { %>
+        <% categories.forEach(function(category) { %>
+          <a href="/?category=<%= encodeURIComponent(category.category_name) %>" 
+             class="category-filter-item <%= selectedCategory === category.category_name ? 'active' : '' %>">
+            <i class="fas fa-tag"></i>
+            <span><%= category.category_name %></span>
+          </a>
+        <% }); %>
+      <% } %>
     </div>
   </div>
 </section>
 
-<!-- 최신 상품 섹션 -->
 <main class="products-section">
   <div class="products-container">
     <div class="section-header">
-      <h2 class="section-title">최신 상품</h2>
-      <!-- <div class="sort-options">
-        <select class="sort-select">
-          <option value="latest">최신순</option>
-          <option value="price-low">낮은 가격순</option>
-          <option value="price-high">높은 가격순</option>
-          <option value="popular">인기순</option>
-        </select>
-      </div> -->
+      <h2 class="section-title">
+        <% if (typeof searchQuery !== 'undefined' && searchQuery) { %>
+          "<%= searchQuery %>" 검색 결과 <%= typeof pagination !== 'undefined' ? `(${pagination.totalCount}개)` : '' %>
+        <% } else if (selectedCategory) { %>
+          <%= selectedCategory %> 상품
+        <% } else { %>
+          최신 상품
+        <% } %>
+      </h2>
+      <% if (selectedCategory || (typeof searchQuery !== 'undefined' && searchQuery)) { %>
+        <a href="/" class="clear-filter-btn">
+          <i class="fas fa-times"></i> <%= typeof searchQuery !== 'undefined' && searchQuery ? '검색 초기화' : '필터 초기화' %>
+        </a>
+      <% } %>
     </div>
     
     <div class="products-grid">
       <% if (typeof posts !== 'undefined' && posts && posts.length > 0) { %>
         <% posts.forEach(function(post) { %>
-          <div class="product-card">
-            <div class="product-image">
-              <% if (post.images && post.images.length > 0) { %>
-                <img src="<%= post.images[0] %>\" alt="<%= post.title %>">
-              <% } else { %>
-                <img src="https://via.placeholder.com/250x200/E2E8F0/718096?text=이미지없음\" alt="<%= post.title %>">
-              <% } %>
-              <div class="product-status <%= post.status === 'SOLD' ? 'sold' : '' %>"><%= post.status === 'SOLD' ? '판매완료' : '판매중' %></div>
-            </div>
-            <div class="product-info">
-              <h3 class="product-title"><%= post.title %></h3>
-              <p class="product-price"><%= post.price.toLocaleString() %>원</p>
-              <div class="product-meta">
-                <span class="location"><i class="fas fa-map-marker-alt"></i> <%= post.region || '지역정보없음' %></span>
-                <span class="time"><i class="fas fa-clock"></i> <%= new Date(post.createdAt).toLocaleDateString() %></span>
+          <a href="/post/<%= post.id %>" class="product-card-link">
+            <div class="product-card">
+              <div class="product-image">
+                <% if (post.images && Array.isArray(post.images) && post.images.length > 0 && post.images[0]) { %>
+                  <img src="<%= post.images[0] %>" alt="<%= post.title %>" onerror="this.onerror=null; this.src='https://placehold.co/250x200/e9ecef/6c757d?text=No+Image';">
+                <% } else { %>
+                  <img src="https://placehold.co/250x200/e9ecef/6c757d?text=No+Image" alt="<%= post.title %>">
+                <% } %>
+                <div class="product-status <%= post.status === 'CLOSE' ? 'sold' : '' %>">
+                  <%= post.status === 'CLOSE' ? '판매완료' : '판매중' %>
+                </div>
+              </div>
+              <div class="product-info">
+                <h3 class="product-title"><%= post.title %></h3>
+                <p class="product-price"><%= post.price ? post.price.toLocaleString() : 0 %>원</p>
+                <div class="product-meta">
+                  <span class="location"><i class="fas fa-map-marker-alt"></i> <%= post.region || '지역정보없음' %></span>
+                  <span class="time"><i class="fas fa-clock"></i> <%= new Date(post.createdAt).toLocaleDateString() %></span>
+                </div>
               </div>
             </div>
-          </div>
+          </a>
         <% }); %>
       <% } else { %>
-        <!-- 샘플 게시글들 -->
-        <div class="product-card">
-          <div class="product-image">
-            <img src="https://via.placeholder.com/250x200/4A90E2/ffffff?text=헤드폰" alt="무선 헤드폰">
-            <div class="product-status">판매중</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title">소니 무선 헤드폰 WH-1000XM4</h3>
-            <p class="product-price">150,000원</p>
-            <div class="product-meta">
-              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 강남구</span>
-              <span class="time"><i class="fas fa-clock"></i> 2시간 전</span>
-            </div>
-          </div>
+        <div class="no-posts-message" style="grid-column: 1/-1; text-align: center; padding: 50px; color: #888;">
+          <i class="fas fa-inbox" style="font-size: 48px; margin-bottom: 20px; display: block;"></i>
+          <p>아직 등록된 상품이 없습니다.</p>
+          <% if (typeof isLoggedIn !== 'undefined' && isLoggedIn) { %>
+            <a href="/post/new" class="btn btn-primary" style="margin-top: 20px; display: inline-block;">첫 상품 등록하기</a>
+          <% } %>
         </div>
       <% } %>
-        
-        <div class="product-card">
-          <div class="product-image">
-            <img src="https://via.placeholder.com/250x200/50C878/ffffff?text=책" alt="전공서적">
-            <div class="product-status">판매중</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title">컴퓨터공학 전공서적 3권 세트</h3>
-            <p class="product-price">25,000원</p>
-            <div class="product-meta">
-              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 성북구</span>
-              <span class="time"><i class="fas fa-clock"></i> 1일 전</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="product-card">
-          <div class="product-image">
-            <img src="https://via.placeholder.com/250x200/FF6B6B/ffffff?text=의류" alt="후드티">
-            <div class="product-status">판매중</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title">나이키 후드티 (M사이즈)</h3>
-            <p class="product-price">35,000원</p>
-            <div class="product-meta">
-              <span class="location"><i class="fas fa-map-marker-alt"></i> 경기 성남시</span>
-              <span class="time"><i class="fas fa-clock"></i> 3시간 전</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="product-card">
-          <div class="product-image">
-            <img src="https://via.placeholder.com/250x200/FFD93D/ffffff?text=전자기기" alt="태블릿">
-            <div class="product-status">판매중</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title">아이패드 에어 4세대 64GB</h3>
-            <p class="product-price">450,000원</p>
-            <div class="product-meta">
-              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 마포구</span>
-              <span class="time"><i class="fas fa-clock"></i> 5시간 전</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="product-card">
-          <div class="product-image">
-            <img src="https://via.placeholder.com/250x200/A569BD/ffffff?text=화장품" alt="화장품">
-            <div class="product-status">판매중</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title">에스티로더 파운데이션 새상품</h3>
-            <p class="product-price">28,000원</p>
-            <div class="product-meta">
-              <span class="location"><i class="fas fa-map-marker-alt"></i> 서울 종로구</span>
-              <span class="time"><i class="fas fa-clock"></i> 1일 전</span>
-            </div>
-          </div>
-        </div>
-        
-        <div class="product-card">
-          <div class="product-image">
-            <img src="https://via.placeholder.com/250x200/45B7D1/ffffff?text=가전" alt="청소기">
-            <div class="product-status">판매중</div>
-          </div>
-          <div class="product-info">
-            <h3 class="product-title">다이슨 무선청소기 V8</h3>
-            <p class="product-price">180,000원</p>
-            <div class="product-meta">
-              <span class="location"><i class="fas fa-map-marker-alt"></i> 인천 남동구</span>
-              <span class="time"><i class="fas fa-clock"></i> 6시간 전</span>
-            </div>
-          </div>
-        </div>
     </div>
     
-    <div class="load-more">
-      <button class="btn btn-outline">더 많은 상품 보기</button>
-    </div>
+    <!-- 페이지네이션 -->
+    <% if (typeof pagination !== 'undefined' && pagination.totalPages > 1) { %>
+      <div class="pagination">
+        <% 
+          const currentPage = pagination.currentPage;
+          const totalPages = pagination.totalPages;
+          const category = typeof selectedCategory !== 'undefined' && selectedCategory ? selectedCategory : '';
+          const search = typeof searchQuery !== 'undefined' && searchQuery ? searchQuery : '';
+          
+          let baseUrl = '/';
+          if (search) {
+            baseUrl = '/search?query=' + encodeURIComponent(search) + '&';
+          } else if (category) {
+            baseUrl = '/?category=' + encodeURIComponent(category) + '&';
+          } else {
+            baseUrl = '/?';
+          }
+        %>
+        
+        <% if (currentPage > 1) { %>
+          <a href="<%= baseUrl %>page=<%= currentPage - 1 %>" class="pagination-btn">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        <% } else { %>
+          <span class="pagination-btn disabled">
+            <i class="fas fa-chevron-left"></i>
+          </span>
+        <% } %>
+        
+        <div class="pagination-numbers">
+          <% 
+            const startPage = Math.max(1, currentPage - 2);
+            const endPage = Math.min(totalPages, currentPage + 2);
+            for (let i = startPage; i <= endPage; i++) {
+          %>
+            <a href="<%= baseUrl %>page=<%= i %>" 
+               class="pagination-number <%= i === currentPage ? 'active' : '' %>">
+              <%= i %>
+            </a>
+          <% } %>
+        </div>
+        
+        <% if (currentPage < totalPages) { %>
+          <a href="<%= baseUrl %>page=<%= currentPage + 1 %>" class="pagination-btn">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        <% } else { %>
+          <span class="pagination-btn disabled">
+            <i class="fas fa-chevron-right"></i>
+          </span>
+        <% } %>
+      </div>
+    <% } %>
   </div>
 </main>
+
+<style>
+  .pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    margin: 40px 0;
+  }
+  
+  .pagination-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #64748b;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .pagination-btn:hover:not(.disabled) {
+    border-color: #667eea;
+    background: #f7f9ff;
+    color: #667eea;
+  }
+  
+  .pagination-btn.disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  
+  .pagination-numbers {
+    display: flex;
+    gap: 4px;
+  }
+  
+  .pagination-number {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 12px;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    background: white;
+    color: #64748b;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-decoration: none;
+  }
+  
+  .pagination-number:hover {
+    border-color: #667eea;
+    background: #f7f9ff;
+    color: #667eea;
+  }
+  
+  .pagination-number.active {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: #667eea;
+    color: white;
+  }
+</style>
+
+<script>
+let currentOffset = 21; // 초기 로드에서 21개 표시했으므로
+let isLoading = false;
+const selectedCategory = '<%= typeof selectedCategory !== "undefined" && selectedCategory ? selectedCategory : "" %>';
+
+async function loadMorePosts() {
+  if (isLoading) return;
+  
+  isLoading = true;
+  const loadMoreBtn = document.getElementById('loadMoreBtn');
+  loadMoreBtn.disabled = true;
+  loadMoreBtn.textContent = '로딩 중...';
+  
+  try {
+    let apiUrl = `/api/post?limit=21&offset=${currentOffset}`;
+    if (selectedCategory) {
+      apiUrl += `&category=${encodeURIComponent(selectedCategory)}`;
+    }
+    
+    const response = await fetch(apiUrl);
+    const data = await response.json();
+    
+    if (data.success && data.data && data.data.length > 0) {
+      const productsGrid = document.querySelector('.products-grid');
+      
+      data.data.forEach(post => {
+        const productCard = createProductCard(post);
+        productsGrid.appendChild(productCard);
+      });
+      
+      currentOffset += data.data.length;
+      
+      // 21개 미만이면 더 이상 없는 것
+      if (data.data.length < 21) {
+        loadMoreBtn.style.display = 'none';
+      }
+    } else {
+      loadMoreBtn.style.display = 'none';
+    }
+  } catch (error) {
+    console.error('게시글 로드 오류:', error);
+    alert('게시글을 불러오는 중 오류가 발생했습니다.');
+  } finally {
+    isLoading = false;
+    loadMoreBtn.disabled = false;
+    loadMoreBtn.textContent = '더 많은 상품 보기';
+  }
+}
+
+function createProductCard(post) {
+  const link = document.createElement('a');
+  link.href = `/post/${post.id}`;
+  link.className = 'product-card-link';
+  
+  const imageUrl = (post.images && Array.isArray(post.images) && post.images.length > 0 && post.images[0])
+    ? post.images[0] 
+    : 'https://via.placeholder.com/250x200/f8f9fa/6c757d?text=No+Image';
+  
+  const statusText = post.status === 'CLOSE' ? '판매완료' : '판매중';
+  const statusClass = post.status === 'CLOSE' ? 'sold' : '';
+  
+  const createdDate = new Date(post.createdAt).toLocaleDateString();
+  
+  link.innerHTML = `
+    <div class="product-card">
+      <div class="product-image">
+        <img src="${imageUrl}" alt="${post.title}">
+        <div class="product-status ${statusClass}">
+          ${statusText}
+        </div>
+      </div>
+      <div class="product-info">
+        <h3 class="product-title">${post.title}</h3>
+        <p class="product-price">${post.price ? post.price.toLocaleString() : 0}원</p>
+        <div class="product-meta">
+          <span class="location"><i class="fas fa-map-marker-alt"></i> ${post.region || '지역정보없음'}</span>
+          <span class="time"><i class="fas fa-clock"></i> ${createdDate}</span>
+        </div>
+      </div>
+    </div>
+  `;
+  
+  return link;
+}
+</script>

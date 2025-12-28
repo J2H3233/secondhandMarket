@@ -14,4 +14,5 @@ export interface LoginRequestBody {
 
 export interface SessionUserInfo {
     userId?: number;
+    userName?: string;
 }

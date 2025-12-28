@@ -5,3 +5,7 @@
 /node_modules
 
 /dist/*
+
+.uploads/temp/*.png
+
+uploads/temp/
